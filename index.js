@@ -13,6 +13,9 @@ const convertToKoreanTime = (timestamp) => {
   return koreanTime;
 };
 
+// Object to store and manage request information
+const requestStore = {};
+
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
   // Acknowledge the shortcut request
@@ -29,6 +32,23 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
+
+      // Create a unique key for this request
+      const requestId = `${shortcut.channel.id}-${shortcut.message.thread_ts}`;
+
+      // Check if this request is already being processed
+      if (requestStore[requestId]) {
+        console.log('Request already in progress. Skipping...');
+        return;
+      }
+
+      // Store request information to prevent duplicate processing
+      requestStore[requestId] = {
+        timestamp: koreanMessageTime,
+        threadTs: shortcut.message.thread_ts,
+        channelId: shortcut.channel.id,
+      };
+
       const replies = await app.client.conversations.replies({
         channel: shortcut.channel.id,
         ts: shortcut.message.thread_ts, // Use message.thread_ts for the thread
@@ -47,6 +67,9 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
         console.log('--- Nested Thread Replies ---');
         await fetchNestedReplies(lastReply.thread_ts, shortcut.channel.id);
       }
+
+      // Remove request from store after processing
+      delete requestStore[requestId];
     }
   } catch (error) {
     console.error(error);
@@ -54,21 +77,30 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
 });
 
 // Function to fetch nested thread replies
-const fetchNestedReplies = async (threadTs, channel, stop = true) => {
-  const nestedReplies = await app.client.conversations.replies({
-    channel,
-    ts: threadTs,
-  });
+const fetchNestedReplies = async (threadTs, channel) => {
+  let cursor = undefined;
+  let allNestedReplies = [];
 
-  nestedReplies.messages.forEach((nestedReply) => {
+  while (true) {
+    const nestedReplies = await app.client.conversations.replies({
+      channel,
+      ts: threadTs,
+      cursor,
+    });
+
+    allNestedReplies = allNestedReplies.concat(nestedReplies.messages);
+
+    if (!nestedReplies.has_more) {
+      break;
+    }
+
+    cursor = nestedReplies.response_metadata.next_cursor;
+  }
+
+  allNestedReplies.forEach((nestedReply) => {
     const koreanNestedReplyTime = convertToKoreanTime(nestedReply.ts);
     console.log('Nested Reply Time:', koreanNestedReplyTime);
     console.log('Nested Reply Text:', nestedReply.text);
-
-    // If there are further nested replies and stop is true, fetch them recursively
-    if (nestedReply.thread_ts && stop) {
-      fetchNestedReplies(nestedReply.thread_ts, channel, false);
-    }
   });
 };
 
