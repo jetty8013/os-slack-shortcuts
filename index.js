@@ -16,11 +16,14 @@ slackInteractions.shortcut({ type: 'message_action', callbackId: 'slackShortcuts
   // This will be called when a user clicks a message action (MessageShortcut)
   console.log('MessageShortcut Clicked:', payload);
 
-  // Respond to the message action
-  respond({
-    text: 'MessageShortcut clicked!',
-    replace_original: false, // Keep the original message in the chat
-  });
+  // Respond to the message action with 200 OK
+  respond(
+    {
+      text: 'MessageShortcut clicked!',
+      replace_original: false, // Keep the original message in the chat
+    },
+    200
+  ); // Send 200 OK response
 });
 
 // Start the express server
