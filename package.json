@@ -1,1 +1,1 @@
-{"name":"os-slack-shortcuts","version":"1.0.0","main":"index.js","scripts":{"start":"node index.js","test":"echo \"Error: no test specified\" && exit 1"},"dependencies":{"@slack/bolt":"^3.17.1"}}
+{"name":"os-slack-shortcuts","version":"1.0.0","main":"index.js","scripts":{"start":"node index.js","test":"echo \"Error: no test specified\" && exit 1"},"dependencies":{"@slack/bolt":"^3.17.1","moment-timezone":"^0.5.45"}}
