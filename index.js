@@ -34,17 +34,19 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
         ts: shortcut.message.thread_ts, // Use message.thread_ts for the thread
       });
 
-      replies.messages.forEach((reply) => {
-        const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
-        console.log('Reply Time:', koreanReplyTime);
-        console.log('Reply Text:', reply.text);
+      const lastReply = replies.messages[replies.messages.length - 1]; // Get the last reply
 
-        // If the reply has replies (nested threads), you can fetch them recursively
-        if (reply.thread_ts) {
-          console.log('--- Nested Thread Replies ---');
-          fetchNestedReplies(reply.thread_ts, shortcut.channel.id);
-        }
-      });
+      if (lastReply) {
+        const koreanReplyTime = convertToKoreanTime(lastReply.ts); // Convert reply time to Korean time
+        console.log('Last Reply Time:', koreanReplyTime);
+        console.log('Last Reply Text:', lastReply.text);
+      }
+
+      // Fetch nested replies only if there are any
+      if (lastReply && lastReply.thread_ts) {
+        console.log('--- Nested Thread Replies ---');
+        await fetchNestedReplies(lastReply.thread_ts, shortcut.channel.id);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -52,7 +54,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
 });
 
 // Function to fetch nested thread replies
-const fetchNestedReplies = async (threadTs, channel) => {
+const fetchNestedReplies = async (threadTs, channel, stop = true) => {
   const nestedReplies = await app.client.conversations.replies({
     channel,
     ts: threadTs,
@@ -63,9 +65,9 @@ const fetchNestedReplies = async (threadTs, channel) => {
     console.log('Nested Reply Time:', koreanNestedReplyTime);
     console.log('Nested Reply Text:', nestedReply.text);
 
-    // If there are further nested replies, fetch them recursively
-    if (nestedReply.thread_ts) {
-      fetchNestedReplies(nestedReply.thread_ts, channel);
+    // If there are further nested replies and stop is true, fetch them recursively
+    if (nestedReply.thread_ts && stop) {
+      fetchNestedReplies(nestedReply.thread_ts, channel, false);
     }
   });
 };
