@@ -19,6 +19,7 @@ slackInteractions.shortcut({ type: 'message_action', callbackId: 'slackShortcuts
   // Respond to the message action
   respond({
     text: 'MessageShortcut clicked!',
+    replace_original: false, // Keep the original message in the chat
   });
 });
 
