@@ -51,9 +51,9 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
     const messageTs = shortcut.message.ts; // Unix Epoch time
     const koreanMessageTime = convertToKoreanTime(messageTs); // Convert to Korean time
 
-    console.log('Message Shortcut Info:');
-    console.log('Timestamp:', koreanMessageTime);
-    console.log('Text:', shortcut.message.text);
+    // console.log('Message Shortcut Info:');
+    // console.log('Timestamp:', koreanMessageTime);
+    // console.log('Text:', shortcut.message.text);
 
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
