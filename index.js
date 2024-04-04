@@ -26,23 +26,49 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
     console.log('Timestamp:', koreanMessageTime);
     console.log('Text:', shortcut.message.text);
 
-    if (shortcut.thread_ts) {
+    if (shortcut.message.thread_ts) {
+      // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
       const replies = await app.client.conversations.replies({
         channel: shortcut.channel.id,
-        ts: shortcut.thread_ts,
+        ts: shortcut.message.thread_ts, // Use message.thread_ts for the thread
       });
 
       replies.messages.forEach((reply) => {
         const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
         console.log('Reply Time:', koreanReplyTime);
         console.log('Reply Text:', reply.text);
+
+        // If the reply has replies (nested threads), you can fetch them recursively
+        if (reply.thread_ts) {
+          console.log('--- Nested Thread Replies ---');
+          fetchNestedReplies(reply.thread_ts, shortcut.channel.id);
+        }
       });
     }
   } catch (error) {
     console.error(error);
   }
 });
+
+// Function to fetch nested thread replies
+const fetchNestedReplies = async (threadTs, channel) => {
+  const nestedReplies = await app.client.conversations.replies({
+    channel,
+    ts: threadTs,
+  });
+
+  nestedReplies.messages.forEach((nestedReply) => {
+    const koreanNestedReplyTime = convertToKoreanTime(nestedReply.ts);
+    console.log('Nested Reply Time:', koreanNestedReplyTime);
+    console.log('Nested Reply Text:', nestedReply.text);
+
+    // If there are further nested replies, fetch them recursively
+    if (nestedReply.thread_ts) {
+      fetchNestedReplies(nestedReply.thread_ts, channel);
+    }
+  });
+};
 
 (async () => {
   // Start the app
