@@ -27,7 +27,7 @@ slackInteractions.shortcut({ type: 'message_action', callbackId: 'slackShortcuts
 });
 
 // Start the express server
-const server = createServer(app);
-server.listen(port, () => {
-  console.log(`Listening for events on port ${port}`);
-});
+(async () => {
+  const server = await slackInteractions.start(port);
+  console.log(`Listening for events on ${server.address().port}`);
+})();
