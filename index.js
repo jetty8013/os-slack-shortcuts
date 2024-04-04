@@ -12,9 +12,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
 
   try {
     // Send a message when the shortcut is clicked
-    await respond({
-      text: 'MessageShortcut clicked!',
-    });
+    await respond({});
   } catch (error) {
     console.error(error);
   }
