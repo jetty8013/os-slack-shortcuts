@@ -6,48 +6,18 @@ const app = new App({
 });
 
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack, client, logger }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
+  // Acknowledge the shortcut request
+  await ack();
+
   try {
-    // Acknowledge shortcut request
-    await ack();
-
-    // Call the views.open method using one of the built-in WebClients
-    const result = await client.views.open({
-      trigger_id: shortcut.trigger_id,
-      view: {
-        type: 'modal',
-        title: {
-          type: 'plain_text',
-          text: 'My App',
-        },
-        close: {
-          type: 'plain_text',
-          text: 'Close',
-        },
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: 'About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>.',
-            },
-          },
-          {
-            type: 'context',
-            elements: [
-              {
-                type: 'mrkdwn',
-                text: 'Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>',
-              },
-            ],
-          },
-        ],
-      },
+    console.log(shortcut);
+    // Send a message when the shortcut is clicked
+    await respond({
+      text: 'MessageShortcut clicked!',
     });
-
-    logger.info(result);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
   }
 });
 
