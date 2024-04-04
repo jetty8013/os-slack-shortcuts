@@ -13,31 +13,30 @@ const convertToKoreanTime = (timestamp) => {
   return koreanTime;
 };
 
-// Function to get all messages in a thread using conversations.history
+// Function to get all messages in a thread including replies
 const getAllThreadMessages = async (channel, threadTs) => {
   try {
     let allMessages = [];
-    let cursor = null;
 
-    // Use a loop to paginate through messages
+    let cursor;
     while (true) {
-      const history = await app.client.conversations.history({
+      const history = await app.client.conversations.replies({
         channel,
-        latest: threadTs,
-        oldest: threadTs,
-        inclusive: true,
-        cursor, // Pass the cursor for pagination
+        ts: threadTs,
+        cursor,
       });
 
-      if (history.messages && history.messages.length > 0) {
+      if (history.ok) {
         allMessages = allMessages.concat(history.messages);
-      }
 
-      // Check if there are more messages to fetch
-      if (history.response_metadata && history.response_metadata.next_cursor) {
+        if (!history.has_more) {
+          break;
+        }
+
         cursor = history.response_metadata.next_cursor;
       } else {
-        break; // Break the loop if no more messages
+        console.error('Error fetching thread messages:', history.error);
+        return null;
       }
     }
 
@@ -49,7 +48,7 @@ const getAllThreadMessages = async (channel, threadTs) => {
 };
 
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
   // Acknowledge the shortcut request
   await ack();
 
