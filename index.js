@@ -9,15 +9,21 @@ const slackInteractions = createMessageAdapter(slackSigningSecret);
 const app = express();
 
 // Plug the adapter in as a middleware
-app.use('/shortcuts', slackInteractions.requestListener());
+app.use('/slack/events', slackInteractions.expressMiddleware());
 
-// Example: If you're using a body parser, always put it after the message adapter in the middleware stack
-app.use(express.json()); // Use express.json() instead of bodyParser
-app.use(express.urlencoded({ extended: true })); // Use express.urlencoded() with extended option
+// Listen for Slack events - MessageShortcut
+slackInteractions.shortcut({ type: 'message_action', callbackId: 'slackShortcuts' }, (payload, respond) => {
+  // This will be called when a user clicks a message action (MessageShortcut)
+  console.log('MessageShortcut Clicked:', payload);
 
-// Initialize a server for the express app - you can skip this and the rest if you prefer to use app.listen()
+  // Respond to the message action
+  respond({
+    text: 'MessageShortcut clicked!',
+  });
+});
+
+// Start the express server
 const server = createServer(app);
 server.listen(port, () => {
-  // Log a message when the server is ready
-  console.log(`Listening for events on ${server.address().port}`);
+  console.log(`Listening for events on port ${port}`);
 });
