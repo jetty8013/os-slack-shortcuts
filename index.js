@@ -13,42 +13,8 @@ const convertToKoreanTime = (timestamp) => {
   return koreanTime;
 };
 
-// Function to get all messages in a thread including replies
-const getAllThreadMessages = async (channel, threadTs) => {
-  try {
-    let allMessages = [];
-
-    let cursor;
-    while (true) {
-      const history = await app.client.conversations.replies({
-        channel,
-        ts: threadTs,
-        cursor,
-      });
-
-      if (history.ok) {
-        allMessages = allMessages.concat(history.messages);
-
-        if (!history.has_more) {
-          break;
-        }
-
-        cursor = history.response_metadata.next_cursor;
-      } else {
-        console.error('Error fetching thread messages:', history.error);
-        return null;
-      }
-    }
-
-    return allMessages;
-  } catch (error) {
-    console.error('Error fetching thread messages:', error);
-    return null;
-  }
-};
-
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
   // Acknowledge the shortcut request
   await ack();
 
@@ -62,23 +28,16 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
 
     if (shortcut.thread_ts) {
       console.log('--- Thread Replies ---');
+      const replies = await app.client.conversations.replies({
+        channel: shortcut.channel.id,
+        ts: shortcut.thread_ts,
+      });
 
-      const threadMessages = await getAllThreadMessages(shortcut.channel.id, shortcut.thread_ts);
-
-      if (threadMessages) {
-        // Iterate through all messages in the thread
-        for (const message of threadMessages) {
-          const koreanReplyTime = convertToKoreanTime(message.ts); // Convert reply time to Korean time
-          console.log('Reply Time:', koreanReplyTime);
-          console.log('Reply Text:', message.text);
-
-          // Check if this is the last message in the thread
-          if (message.reply_count && message.subscribed) {
-            console.log('--- Last Reply in Thread ---');
-            break; // Stop iterating if this is the last message in the thread
-          }
-        }
-      }
+      replies.messages.forEach((reply) => {
+        const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
+        console.log('Reply Time:', koreanReplyTime);
+        console.log('Reply Text:', reply.text);
+      });
     }
   } catch (error) {
     console.error(error);
