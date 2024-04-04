@@ -73,7 +73,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
           console.log('Reply Text:', message.text);
 
           // Check if this is the last message in the thread
-          if (message.thread_ts === shortcut.thread_ts && !message.reply_count && !message.subscribed) {
+          if (message.reply_count && message.subscribed) {
             console.log('--- Last Reply in Thread ---');
             break; // Stop iterating if this is the last message in the thread
           }
