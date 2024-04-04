@@ -66,14 +66,6 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
           console.log(`Reply ${index + 1} Time:`, koreanReplyTime);
           console.log(`Reply ${index + 1} Text:`, reply.text);
         });
-
-        const lastReply = threadReplies[threadReplies.length - 1];
-        if (lastReply) {
-          console.log('--- Last Reply in Thread ---');
-          const koreanLastReplyTime = convertToKoreanTime(lastReply.ts);
-          console.log('Last Reply Time:', koreanLastReplyTime);
-          console.log('Last Reply Text:', lastReply.text);
-        }
       }
     }
   } catch (error) {
