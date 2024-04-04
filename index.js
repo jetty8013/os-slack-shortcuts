@@ -1,33 +1,28 @@
-const { createServer } = require('http');
-const express = require('express');
-const { createMessageAdapter } = require('@slack/interactive-messages');
-const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
-const port = process.env.PORT || 3000;
-const slackInteractions = createMessageAdapter(slackSigningSecret);
+const { App } = require('@slack/bolt');
 
-// Create an express application
-const app = express();
-
-// Plug the adapter in as a middleware
-app.use('/slack/events', slackInteractions.expressMiddleware());
-
-// Listen for Slack events - MessageShortcut
-slackInteractions.shortcut({ type: 'message_action', callbackId: 'slackShortcuts' }, (payload, respond) => {
-  // This will be called when a user clicks a message action (MessageShortcut)
-  console.log('MessageShortcut Clicked:', payload);
-
-  // Respond to the message action with 200 OK
-  respond(
-    {
-      text: 'MessageShortcut clicked!',
-      replace_original: false, // Keep the original message in the chat
-    },
-    200
-  ); // Send 200 OK response
+const app = new App({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  token: process.env.SLACK_BOT_TOKEN,
 });
 
-// Start the express server
+// Handle MessageShortcut
+app.shortcut('slackShortcuts', async ({ shortcut, ack, respond }) => {
+  // Acknowledge the shortcut request
+  await ack();
+
+  try {
+    // Send a message when the shortcut is clicked
+    await respond({
+      text: 'MessageShortcut clicked!',
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 (async () => {
-  const server = await slackInteractions.start(port);
-  console.log(`Listening for events on ${server.address().port}`);
+  // Start the app
+  await app.start(process.env.PORT || 3000);
+
+  console.log('⚡️ Bolt app is running!');
 })();
