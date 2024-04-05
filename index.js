@@ -48,13 +48,6 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
   await ack();
 
   try {
-    const messageTs = shortcut.message.ts; // Unix Epoch time
-    const koreanMessageTime = convertToKoreanTime(messageTs); // Convert to Korean time
-
-    // console.log('Message Shortcut Info:');
-    // console.log('Timestamp:', koreanMessageTime);
-    // console.log('Text:', shortcut.message.text);
-
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
@@ -67,6 +60,14 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
           console.log(`Reply ${index + 1} Text:`, reply.text);
         });
       }
+
+      const emoji = '✅'; // You can change this to any emoji
+      await app.client.reactions.add({
+        token: process.env.SLACK_BOT_TOKEN,
+        name: emoji,
+        channel: shortcut.channel.id,
+        timestamp: shortcut.message.thread_ts,
+      });
     }
   } catch (error) {
     console.error(error);
