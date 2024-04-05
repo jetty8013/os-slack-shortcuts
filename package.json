@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "@slack/bolt":"^3.17.1",
-    "moment-timezone":"^0.5.45",
+    "moment-timezone":"^0.5.45"
   }    
 }
