@@ -2,12 +2,11 @@
   "name":"os-slack-shortcuts",
   "version":"1.0.0",
   "main":"index.js",
-  "scripts":
-  {
+  "scripts": {
     "start":"node index.js",
     "test":"echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies":{
+  "dependencies": {
     "@slack/bolt":"^3.17.1",
     "moment-timezone":"^0.5.45",
     "googleapis": "^133.0.0"
