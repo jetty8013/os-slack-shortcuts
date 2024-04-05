@@ -1,36 +1,10 @@
 const { App } = require('@slack/bolt');
 const moment = require('moment-timezone');
-const { google } = require('googleapis');
-const credentials = require('./crack-linker-414014-ee89ccc30307.json');
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   token: process.env.SLACK_BOT_TOKEN,
 });
-
-const client = new google.auth.JWT(credentials.client_email, null, credentials.private_key, ['https://www.googleapis.com/auth/spreadsheets']);
-
-async function addRowsSWToSheet(data) {
-  const sheets = google.sheets({ version: 'v4', auth: client });
-
-  const request = {
-    spreadsheetId: '1nXJfHhF1kxsXEZJhJlWAgwe1E4acWVMjxuZlSWw3IOQ', // Replace with your spreadsheet ID
-    range: '배차', // Replace with your sheet name
-    valueInputOption: 'RAW',
-    resource: {
-      values: data, // data should be an array of arrays, each inner array represents a row
-    },
-  };
-
-  try {
-    const response = await sheets.spreadsheets.values.append(request);
-    console.log('Rows added:', response.data);
-    return response.data;
-  } catch (err) {
-    console.error('Error adding rows:', err);
-    throw err;
-  }
-}
 
 // Function to convert Unix Epoch time to Korean time
 const convertToKoreanTime = (timestamp) => {
