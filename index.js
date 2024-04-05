@@ -59,14 +59,15 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
           console.log(`Reply ${index + 1} Time:`, koreanReplyTime);
           console.log(`Reply ${index + 1} Text:`, reply.text);
         });
-      }
 
-      return app.client.chat.postMessage({
-        token: process.env.SLACK_BOT_TOKEN,
-        channel: shortcut.channel.id,
-        thread_ts: reply.ts, // Reply to the specific message
-        text: `운영일지 전송 완료`, // Customize your reply text here
-      });
+        // Send a single message after iterating through all replies
+        await app.client.chat.postMessage({
+          token: process.env.SLACK_BOT_TOKEN,
+          channel: shortcut.channel.id,
+          thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+          text: `운영일지 전송 완료`, // Customize your reply text here
+        });
+      }
     }
   } catch (error) {
     console.error(error);
