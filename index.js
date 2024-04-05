@@ -61,12 +61,11 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
         });
       }
 
-      const emoji = '✅'; // You can change this to any emoji
       await app.client.reactions.add({
         token: process.env.SLACK_BOT_TOKEN,
-        name: emoji,
+        name: 'thumbsup', // Change to the desired emoji name
         channel: shortcut.channel.id,
-        timestamp: shortcut.message.thread_ts,
+        timestamp: reply.ts,
       });
     }
   } catch (error) {
