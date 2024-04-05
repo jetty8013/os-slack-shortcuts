@@ -54,19 +54,24 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
 
       if (threadReplies.length > 0) {
-        threadReplies.forEach((reply, index) => {
+        // Create an array of promises for posting replies to each message
+        const replyPromises = threadReplies.map(async (reply, index) => {
           const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
           console.log(`Reply ${index + 1} Time:`, koreanReplyTime);
           console.log(`Reply ${index + 1} Text:`, reply.text);
-        });
-      }
 
-      await app.client.reactions.add({
-        token: process.env.SLACK_BOT_TOKEN,
-        name: 'thumbsup', // Change to the desired emoji name
-        channel: shortcut.channel.id,
-        timestamp: reply.ts,
-      });
+          // Post a reply to each message
+          return app.client.chat.postMessage({
+            token: process.env.SLACK_BOT_TOKEN,
+            channel: shortcut.channel.id,
+            thread_ts: reply.ts, // Reply to the specific message
+            text: `운영일지 전송 완료`, // Customize your reply text here
+          });
+        });
+
+        // Execute all reply promises in parallel
+        await Promise.all(replyPromises);
+      }
     }
   } catch (error) {
     console.error(error);
