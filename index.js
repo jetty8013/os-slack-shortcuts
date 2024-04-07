@@ -66,7 +66,7 @@ const parseThreadReplies = (replies, username) => {
     const [, date, time, site, scenarioId, robotName, departure, destination] = match;
 
     // Format the data as an array
-    const rowData = [date.trim(), time.trim(), site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username.trim()];
+    const rowData = [date.trim(), time.trim(), site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
 
     // Pushing formatted data to the array
     data.push(rowData);
