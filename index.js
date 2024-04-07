@@ -68,8 +68,11 @@ const parseThreadReplies = (replies) => {
     // Extracting Korean date and time
     const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
-    // Pushing extracted data to the array
-    data.push([koreanDate, koreanTime, site.trim(), robotName.trim(), departure.trim(), destination.trim()]);
+    // Format the data as desired
+    const formattedData = `${koreanDate}\t${koreanTime}\t${site.trim()}\t#${robotName.trim()}\t${departure.trim()} -> ${destination.trim()}`;
+
+    // Pushing formatted data to the array
+    data.push([formattedData]);
   });
 
   return data;
