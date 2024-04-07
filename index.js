@@ -79,6 +79,7 @@ const parseThreadReplies = (replies, username) => {
     data.push(rowData);
   });
 
+  console.log(data);
   return data;
 };
 
