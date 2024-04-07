@@ -137,8 +137,6 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
       const { real_name } = userInfo.user;
 
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
-      console.log(threadReplies);
-
       if (threadReplies.length > 0) {
         for (let i = 0; i < threadReplies.length; i++) {
           const reply = threadReplies[i];
