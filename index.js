@@ -45,7 +45,7 @@ const fetchAllReplies = async (threadTs, channel) => {
 };
 
 // Function to parse thread replies and extract required information
-const parseThreadReplies = (replies) => {
+const parseThreadReplies = (replies, username) => {
   if (!replies || replies.length === 0) {
     return [];
   }
@@ -63,16 +63,28 @@ const parseThreadReplies = (replies) => {
       return; // Skip this iteration if the regex doesn't match
     }
 
-    const [, site, robotName, scenarioDetails, departure, destination] = match;
+    const [, site, robotName, scenarioDetails, , destination] = match;
 
     // Extracting Korean date and time
     const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
-    // Format the data as desired
-    const formattedData = `${koreanDate}\t${koreanTime}\t${site.trim()}\t#${robotName.trim()}\t${departure.trim()} -> ${destination.trim()}`;
+    // Extracting the scenario ID from the robotName
+    const scenarioIdMatch = robotName.match(/#(\d+)/);
+    const scenarioId = scenarioIdMatch ? scenarioIdMatch[1] : '';
+
+    // Format the data as an array
+    const rowData = [
+      koreanDate,
+      koreanTime,
+      site.trim(),
+      scenarioId,
+      robotName.trim(),
+      destination.trim(),
+      username,
+    ];
 
     // Pushing formatted data to the array
-    data.push([formattedData]);
+    data.push(rowData);
   });
 
   return data;
@@ -88,9 +100,8 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
-      console.log(shortcut.user.username);
       if (threadReplies.length > 0) {
-        const parsedData = parseThreadReplies(threadReplies);
+        const parsedData = parseThreadReplies(threadReplies, shortcut.user.username);
 
         const apiKey = process.env.SHEET_API_KEY;
 
