@@ -53,28 +53,23 @@ const parseThreadReplies = (replies) => {
   const data = [];
 
   replies.forEach((reply) => {
-    if (!reply) {
-      return; // Skip this iteration if reply is null
+    if (!reply.text) {
+      return; // Skip this iteration if reply text is empty
     }
 
-    const { ts, text } = reply;
-    const [, datetime, site, scenarioId, robotName, destination] = text.match(/\[(.*?)\]\[(.*?)\]\[(.*?)\][^\[]*](.*?)\s(.*?)\s([\w\s]+)\s:/);
-
-    // Extracting course name and patrol count
-    let courseName = '',
-      patrolCount = '';
-    const courseMatch = text.match(/코스명:\s([^,]+)/);
-    if (courseMatch) {
-      courseName = courseMatch[1].trim();
-    }
-    const countMatch = text.match(/(\d+\/\d+)\s순회/);
-    if (countMatch) {
-      patrolCount = countMatch[1];
+    // Check if the message matches the expected format
+    const match = reply.text.match(/\[(.*?)\]\[(.*?)\][^:]+:\s*(.*?)\s*(출발지:\s*([^,]+),\s*목적지:\s*(.*))/);
+    if (!match) {
+      return; // Skip this iteration if the regex doesn't match
     }
 
-    const [koreanDate, koreanTime] = convertToKoreanDateTime(ts); // Korean date and time
+    const [, site, robotName, scenarioDetails, departure, destination] = match;
 
-    data.push([koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), courseName, patrolCount]);
+    // Extracting Korean date and time
+    const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+
+    // Pushing extracted data to the array
+    data.push([koreanDate, koreanTime, site.trim(), robotName.trim(), departure.trim(), destination.trim()]);
   });
 
   return data;
