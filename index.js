@@ -1,5 +1,6 @@
 const { App } = require('@slack/bolt');
 const moment = require('moment-timezone');
+const axios = require('axios');
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -59,6 +60,20 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
           console.log(`Reply ${index + 1} Time:`, koreanReplyTime);
           console.log(`Reply ${index + 1} Text:`, reply.text);
         });
+
+        const apiKey = process.env.SHEET_API_KEY;
+
+        const data = {
+          key1: 'value1',
+          key2: 'value2',
+        };
+
+        try {
+          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data);
+          console.log('New row added successfully.');
+        } catch (error) {
+          console.error('Failed to add new row:', error.message);
+        }
 
         // Send a single message after iterating through all replies
         await app.client.chat.postMessage({
