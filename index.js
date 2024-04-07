@@ -56,7 +56,7 @@ const parseThreadReplies = (replies, username) => {
     if (!reply.text) {
       return; // Skip this iteration if reply text is empty
     }
-
+    console.log(reply.text);
     // Check if the message matches the expected format for the first condition
     let match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
     if (match) {
