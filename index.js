@@ -66,12 +66,10 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
         const data = [['test1', 'test2', 'test3']];
 
         try {
-          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, {
-            method: 'POST',
+          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data, {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
           });
           console.log('New row added successfully.');
           await app.client.chat.postMessage({
