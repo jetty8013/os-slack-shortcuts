@@ -56,7 +56,7 @@ const parseThreadReplies = (replies, username) => {
     if (!reply.text) {
       return; // Skip this iteration if reply text is empty
     }
-    console.log(reply.text);
+
     // Check if the message matches the expected format for the first condition
     let match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
     if (match) {
@@ -72,9 +72,9 @@ const parseThreadReplies = (replies, username) => {
       data.push(rowData);
     } else {
       // Check if the message matches the expected format for the second condition
-      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*코스명:\s*(.*?)\)/);
+      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:\s*.*?),\s*(.*?)\)/);
       if (match) {
-        const [, site, scenarioId, robotDetails, departure, course] = match;
+        const [, site, scenarioId, robotDetails, course, rounds] = match;
         const robotMatch = robotDetails.match(/\|([^>]*)>/);
         const robotName = robotMatch ? robotMatch[1] : '';
 
