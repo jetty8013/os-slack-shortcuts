@@ -127,13 +127,13 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
-
       const userInfo = await client.users.info({
         user: shortcut.user.id,
       });
       const { real_name } = userInfo.user;
 
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
+      console.log(threadReplies);
       if (threadReplies.length > 0) {
         const parsedData = parseThreadReplies(threadReplies, real_name);
 
@@ -150,7 +150,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
             token: process.env.SLACK_BOT_TOKEN,
             channel: shortcut.channel.id,
             thread_ts: shortcut.message.thread_ts, // Reply to the main thread
-            text: `운영일지 전송 완료`, // Customize your reply text here
+            text: `배차 기록 전송 완료`, // Customize your reply text here
           });
         } catch (error) {
           await app.client.chat.postMessage({
