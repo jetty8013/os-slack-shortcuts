@@ -90,20 +90,19 @@ const parseThreadReplies = (replies, username) => {
         const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
         // Format the data as an array for the second condition
-        const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), courseName, username];
-        data.push(rowData);
+        //const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), courseName, username];
+        //data.push(rowData);
       } else {
         // Additional check for '순회 시작' in a thread with course information
         if (courseName && reply.text.includes('순회 시작')) {
           [, site, robotDetails, roundsInfo] = reply.text.match(/\[(.*?)\]\s*(.*?)\s*(\d+\/\d+)\s*(순회 시작)/);
           [roundNumber, totalRounds] = roundsInfo.split('/');
-          robotName = getRobotName(robotDetails); // Get robot name from robotDetails
 
           // Extracting Korean date and time
           const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
           // Format the data as an array for the additional condition
-          const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), `순회 중 (${roundNumber}/${totalRounds})`, username];
+          const rowData = [koreanDate, koreanTime, site.trim(), `${scenarioId.trim()}_${roundNumber}`, robotName, courseName, username];
           data.push(rowData);
         }
       }
