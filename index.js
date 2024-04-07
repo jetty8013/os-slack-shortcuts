@@ -67,14 +67,12 @@ const parseThreadReplies = (replies, username) => {
       // Extracting Korean date and time
       const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
-      // Format the data as an array
+      // Format the data as an array for the first condition
       const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
-
-      // Pushing formatted data to the array
       data.push(rowData);
     } else {
       // Check if the message matches the expected format for the second condition
-      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*코스명:\s*(.*?),\s*([^)]+)\)/);
+      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*코스명:\s*(.*?),\s*(.*?)\)/);
       if (match) {
         const [, site, scenarioId, robotDetails, departure, course, rounds] = match;
         const robotMatch = robotDetails.match(/\|([^>]*)>/);
