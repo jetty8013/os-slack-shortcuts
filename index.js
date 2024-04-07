@@ -72,7 +72,19 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
             },
           });
           console.log('New row added successfully.');
+          await app.client.chat.postMessage({
+            token: process.env.SLACK_BOT_TOKEN,
+            channel: shortcut.channel.id,
+            thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+            text: `운영일지 전송 완료`, // Customize your reply text here
+          });
         } catch (error) {
+          await app.client.chat.postMessage({
+            token: process.env.SLACK_BOT_TOKEN,
+            channel: shortcut.channel.id,
+            thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+            text: `전송에 실패했습니다.`, // Customize your reply text here
+          });
           console.error('Failed to add new row:', error.message);
         }
 
