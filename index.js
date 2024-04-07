@@ -45,7 +45,6 @@ const fetchAllReplies = async (threadTs, channel) => {
 };
 
 // Function to parse thread replies and extract required information
-// Function to parse thread replies and extract required information
 const parseThreadReplies = (replies, username) => {
   if (!replies || replies.length === 0) {
     return [];
@@ -59,22 +58,18 @@ const parseThreadReplies = (replies, username) => {
     }
 
     // Check if the message matches the expected format
-    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*<[^|]+\|\s*(.*?)\s*>/);
+    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
     if (!match) {
       return; // Skip this iteration if the regex doesn't match
     }
 
-    const [, site, scenarioId, robotName] = match;
+    const [, site, scenarioId, robotName, departure, destination] = match;
 
     // Extracting Korean date and time
     const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
-    // Extracting the destination
-    const destinationMatch = reply.text.match(/목적지:\s*(.*)/);
-    const destination = destinationMatch ? destinationMatch[1].trim() : '';
-
     // Format the data as an array
-    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination, username];
+    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
 
     // Pushing formatted data to the array
     data.push(rowData);
@@ -84,7 +79,7 @@ const parseThreadReplies = (replies, username) => {
 };
 
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
   // Acknowledge the shortcut request
   await ack();
 
@@ -92,6 +87,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
+
       const userInfo = await client.users.info({
         user: shortcut.user.id,
       });
