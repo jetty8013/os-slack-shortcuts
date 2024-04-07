@@ -78,7 +78,7 @@ const parseThreadReplies = (replies, username) => {
       koreanTime,
       site.trim(),
       scenarioId,
-      robotName.trim(),
+      `${scenarioDetails.trim()} ${robotName.trim()}`, // Including scenario details in the robot name
       destination.trim(),
       username,
     ];
