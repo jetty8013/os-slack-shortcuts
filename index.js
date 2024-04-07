@@ -7,11 +7,12 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
 });
 
-// Function to convert Unix Epoch time to Korean time
-const convertToKoreanTime = (timestamp) => {
+// Function to convert Unix Epoch time to Korean date and time
+const convertToKoreanDateTime = (timestamp) => {
   const unixEpochTime = parseFloat(timestamp);
-  const koreanTime = moment.unix(unixEpochTime).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
-  return koreanTime;
+  const koreanDateTime = moment.unix(unixEpochTime).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
+  const [koreanDate, koreanTime] = koreanDateTime.split(' ');
+  return [koreanDate, koreanTime];
 };
 
 // Function to fetch all replies in a thread
@@ -43,6 +44,42 @@ const fetchAllReplies = async (threadTs, channel) => {
   return allReplies;
 };
 
+// Function to parse thread replies and extract required information
+const parseThreadReplies = (replies) => {
+  if (!replies || replies.length === 0) {
+    return [];
+  }
+
+  const data = [];
+
+  replies.forEach((reply) => {
+    if (!reply) {
+      return; // Skip this iteration if reply is null
+    }
+
+    const { ts, text } = reply;
+    const [, datetime, site, scenarioId, robotName, destination] = text.match(/\[(.*?)\]\[(.*?)\]\[(.*?)\][^\[]*](.*?)\s(.*?)\s([\w\s]+)\s:/);
+
+    // Extracting course name and patrol count
+    let courseName = '',
+      patrolCount = '';
+    const courseMatch = text.match(/코스명:\s([^,]+)/);
+    if (courseMatch) {
+      courseName = courseMatch[1].trim();
+    }
+    const countMatch = text.match(/(\d+\/\d+)\s순회/);
+    if (countMatch) {
+      patrolCount = countMatch[1];
+    }
+
+    const [koreanDate, koreanTime] = convertToKoreanDateTime(ts); // Korean date and time
+
+    data.push([koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), courseName, patrolCount]);
+  });
+
+  return data;
+};
+
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
   // Acknowledge the shortcut request
@@ -54,24 +91,18 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
       console.log('--- Thread Replies ---');
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
       console.log(shortcut.user.username);
-      console.log(threadReplies);
       if (threadReplies.length > 0) {
-        threadReplies.forEach((reply, index) => {
-          const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
-          console.log(koreanReplyTime + ' ' + reply.text);
-        });
+        const parsedData = parseThreadReplies(threadReplies);
 
         const apiKey = process.env.SHEET_API_KEY;
 
-        const data = [['test1', 'test2', 'test3']];
-
         try {
-          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data, {
+          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, parsedData, {
             headers: {
               'Content-Type': 'application/json',
             },
           });
-          console.log('New row added successfully.');
+          console.log('New rows added successfully.');
           await app.client.chat.postMessage({
             token: process.env.SLACK_BOT_TOKEN,
             channel: shortcut.channel.id,
@@ -85,7 +116,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
             thread_ts: shortcut.message.thread_ts, // Reply to the main thread
             text: `전송에 실패했습니다.`, // Customize your reply text here
           });
-          console.error('Failed to add new row:', error.message);
+          console.error('Failed to add new rows:', error.message);
         }
       }
     }
