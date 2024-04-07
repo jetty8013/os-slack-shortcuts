@@ -45,6 +45,7 @@ const fetchAllReplies = async (threadTs, channel) => {
 };
 
 // Function to parse thread replies and extract required information
+// Function to parse thread replies and extract required information
 const parseThreadReplies = (replies, username) => {
   if (!replies || replies.length === 0) {
     return [];
@@ -58,18 +59,22 @@ const parseThreadReplies = (replies, username) => {
     }
 
     // Check if the message matches the expected format
-    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
+    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*<[^|]+\|\s*(.*?)\s*>/);
     if (!match) {
       return; // Skip this iteration if the regex doesn't match
     }
 
-    const [, site, scenarioId, robotName, departure, destination] = match;
+    const [, site, scenarioId, robotName] = match;
 
     // Extracting Korean date and time
     const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
+    // Extracting the destination
+    const destinationMatch = reply.text.match(/목적지:\s*(.*)/);
+    const destination = destinationMatch ? destinationMatch[1].trim() : '';
+
     // Format the data as an array
-    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
+    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination, username];
 
     // Pushing formatted data to the array
     data.push(rowData);
