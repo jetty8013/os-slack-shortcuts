@@ -119,7 +119,7 @@ const getRobotName = (robotDetails) => {
 };
 
 const isSOLog = (reply) => {
-  return reply.text === '배차 기록 전송 완료' && reply.bot_profile && reply.bot_profile.name === '운영일지(SO)';
+  return reply.text.includes('배차 기록 전송 완료') && reply.bot_profile && reply.bot_profile.name === '운영일지(SO)';
 };
 
 // Handle MessageShortcut
@@ -168,14 +168,14 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
             token: process.env.SLACK_BOT_TOKEN,
             channel: shortcut.channel.id,
             thread_ts: shortcut.message.thread_ts, // Reply to the main thread
-            text: `배차 기록 전송 완료`, // Customize your reply text here
+            text: `배차 기록 전송 완료. 요청자 : ${real_name}`, // Customize your reply text here
           });
         } catch (error) {
           await app.client.chat.postMessage({
             token: process.env.SLACK_BOT_TOKEN,
             channel: shortcut.channel.id,
             thread_ts: shortcut.message.thread_ts, // Reply to the main thread
-            text: `전송에 실패했습니다.`, // Customize your reply text here
+            text: `전송에 실패했습니다. 요청자 : ${real_name}`, // Customize your reply text here
           });
           console.error('Failed to add new rows:', error.message);
         }
