@@ -63,10 +63,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
 
         const apiKey = process.env.SHEET_API_KEY;
 
-        const data = {
-          key1: 'value1',
-          key2: 'value2',
-        };
+        const data = ['test1', 'test2', 'test3'];
 
         try {
           const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data, {
