@@ -117,7 +117,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
       if (threadReplies.length > 0) {
         threadReplies.forEach((reply, index) => {
           const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
-          console.log(koreanReplyTime + +reply.text);
+          console.log(koreanReplyTime + ' ' + reply.text);
         });
 
         const apiKey = process.env.SHEET_API_KEY;
