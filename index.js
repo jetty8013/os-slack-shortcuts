@@ -118,6 +118,10 @@ const getRobotName = (robotDetails) => {
   return robotMatch ? robotMatch[1] : '';
 };
 
+const isSOLog = (reply) => {
+  return reply.text === '배차 기록 전송 완료' && reply.bot_profile && reply.bot_profile.name === '운영일지(SO)';
+};
+
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
@@ -134,7 +138,21 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
 
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
       console.log(threadReplies);
+
       if (threadReplies.length > 0) {
+        for (let i = 0; i < threadReplies.length; i++) {
+          const reply = threadReplies[i];
+          if (isSOLog(reply)) {
+            await app.client.chat.postMessage({
+              token: process.env.SLACK_BOT_TOKEN,
+              channel: shortcut.channel.id,
+              thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+              text: `이미 전송된 기록입니다.`, // Customize your reply text here
+            });
+            return null; // Return null if no SO log reply is found;
+          }
+        }
+
         const parsedData = parseThreadReplies(threadReplies, real_name);
 
         const apiKey = process.env.SHEET_API_KEY;
