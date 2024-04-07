@@ -63,10 +63,17 @@ const parseThreadReplies = (replies, username) => {
       return; // Skip this iteration if the regex doesn't match
     }
 
-    const [, date, time, site, scenarioId, robotName, departure, destination] = match;
+    const [, site, robotName, scenarioDetails, , destination] = match;
+
+    // Extracting Korean date and time
+    const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+
+    // Extracting the scenario ID from the robotName
+    const scenarioIdMatch = robotName.match(/#(\d+)/);
+    const scenarioId = scenarioIdMatch ? scenarioIdMatch[1] : '';
 
     // Format the data as an array
-    const rowData = [date.trim(), time.trim(), site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
+    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), destination.trim(), username];
 
     // Pushing formatted data to the array
     data.push(rowData);
