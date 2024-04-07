@@ -84,7 +84,7 @@ const parseThreadReplies = (replies, username) => {
 };
 
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
   await ack();
 
@@ -92,9 +92,14 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
     if (shortcut.message.thread_ts) {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
+      const userInfo = await client.users.info({
+        user: shortcut.user.id,
+      });
+      const { real_name } = userInfo.user;
+
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
       if (threadReplies.length > 0) {
-        const parsedData = parseThreadReplies(threadReplies, shortcut.user.username);
+        const parsedData = parseThreadReplies(threadReplies, real_name);
 
         const apiKey = process.env.SHEET_API_KEY;
 
