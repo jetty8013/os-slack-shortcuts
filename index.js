@@ -51,6 +51,10 @@ const parseThreadReplies = (replies, username) => {
   }
 
   const data = [];
+  let scenarioId = '';
+  let courseName = '';
+  let robotName = '';
+  let site = '';
 
   replies.forEach((reply) => {
     if (!reply.text) {
@@ -60,35 +64,59 @@ const parseThreadReplies = (replies, username) => {
     // Check if the message matches the expected format for the first condition
     let match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
     if (match) {
-      const [, site, scenarioId, robotDetails, departure, destination] = match;
-      const robotMatch = robotDetails.match(/\|([^>]*)>/);
-      const robotName = robotMatch ? robotMatch[1] : '';
+      [, site, currentScenarioId, robotDetails, departure, destination] = match;
+      robotName = getRobotName(robotDetails); // Get robot name from robotDetails
+      scenarioId = currentScenarioId.trim();
 
       // Extracting Korean date and time
       const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
       // Format the data as an array for the first condition
-      const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
+      const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), destination.trim(), username];
       data.push(rowData);
+
+      // Reset courseName
+      courseName = '';
     } else {
       // Check if the message matches the expected format for the second condition
       match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:)?\s*(.*?),\s*(.*?)\)/);
       if (match) {
-        const [, site, scenarioId, robotDetails, , course, rounds] = match;
-        const robotMatch = robotDetails.match(/\|([^>]*)>/);
-        const robotName = robotMatch ? robotMatch[1] : '';
+        [, site, currentScenarioId, robotDetails, , currentCourse, rounds] = match;
+        robotName = getRobotName(robotDetails); // Get robot name from robotDetails
+        scenarioId = currentScenarioId.trim();
+        courseName = currentCourse.trim();
 
         // Extracting Korean date and time
         const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
         // Format the data as an array for the second condition
-        const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), course.trim(), username];
+        const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), courseName, username];
         data.push(rowData);
+      } else {
+        // Additional check for '순회 시작' in a thread with course information
+        if (courseName && reply.text.includes('순회 시작')) {
+          [, site, robotDetails, roundsInfo] = reply.text.match(/\[(.*?)\]\s*(.*?)\s*(\d+\/\d+)\s*(순회 시작)/);
+          [roundNumber, totalRounds] = roundsInfo.split('/');
+          robotName = getRobotName(robotDetails); // Get robot name from robotDetails
+
+          // Extracting Korean date and time
+          const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+
+          // Format the data as an array for the additional condition
+          const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), `순회 중 (${roundNumber}/${totalRounds})`, username];
+          data.push(rowData);
+        }
       }
     }
   });
 
   return data;
+};
+
+// Function to extract robot name from robotDetails
+const getRobotName = (robotDetails) => {
+  const robotMatch = robotDetails.match(/\|([^>]*)>/);
+  return robotMatch ? robotMatch[1] : '';
 };
 
 // Handle MessageShortcut
