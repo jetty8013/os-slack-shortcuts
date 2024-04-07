@@ -113,7 +113,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
       // Check if there is a thread_ts
       console.log('--- Thread Replies ---');
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
-      console.log(shortcut.user.name);
+      console.log(shortcut.user.username);
       if (threadReplies.length > 0) {
         threadReplies.forEach((reply, index) => {
           const koreanReplyTime = convertToKoreanTime(reply.ts); // Convert reply time to Korean time
