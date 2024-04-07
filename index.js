@@ -69,7 +69,11 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
         };
 
         try {
-          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data);
+          const response = await axios.post(`https://port-0-os-tool-server-17xco2nlss79qxq.sel5.cloudtype.app/api/add-row-mission-log?api_key=${apiKey}`, data, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
           console.log('New row added successfully.');
         } catch (error) {
           console.error('Failed to add new row:', error.message);
