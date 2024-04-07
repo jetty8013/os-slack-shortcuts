@@ -45,10 +45,19 @@ const fetchAllReplies = async (threadTs, channel) => {
 };
 
 // Function to parse thread replies and extract required information
+// Function to parse thread replies and extract required information
 const parseThreadReplies = (replies) => {
+  if (!replies || replies.length === 0) {
+    return [];
+  }
+
   const data = [];
 
   replies.forEach((reply) => {
+    if (!reply) {
+      return; // Skip this iteration if reply is null
+    }
+
     const { ts, text } = reply;
     const [, datetime, site, scenarioId, robotName, destination] = text.match(/\[(.*?)\]\[(.*?)\]\[(.*?)\][^\[]*](.*?)\s(.*?)\s([\w\s]+)\s:/);
 
