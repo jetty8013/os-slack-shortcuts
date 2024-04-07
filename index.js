@@ -72,9 +72,9 @@ const parseThreadReplies = (replies, username) => {
       data.push(rowData);
     } else {
       // Check if the message matches the expected format for the second condition
-      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:\s*.*?),\s*(.*?)\)/);
+      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:)?\s*(.*?),\s*(.*?)\)/);
       if (match) {
-        const [, site, scenarioId, robotDetails, course, rounds] = match;
+        const [, site, scenarioId, robotDetails, , course, rounds] = match;
         const robotMatch = robotDetails.match(/\|([^>]*)>/);
         const robotName = robotMatch ? robotMatch[1] : '';
 
