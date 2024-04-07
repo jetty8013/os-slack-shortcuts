@@ -57,25 +57,39 @@ const parseThreadReplies = (replies, username) => {
       return; // Skip this iteration if reply text is empty
     }
 
-    // Check if the message matches the expected format
-    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
-    if (!match) {
-      return; // Skip this iteration if the regex doesn't match
+    // Check if the message matches the expected format for the first condition
+    let match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
+    if (match) {
+      const [, site, scenarioId, robotDetails, departure, destination] = match;
+      const robotMatch = robotDetails.match(/\|([^>]*)>/);
+      const robotName = robotMatch ? robotMatch[1] : '';
+
+      // Extracting Korean date and time
+      const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+
+      // Format the data as an array
+      const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
+
+      // Pushing formatted data to the array
+      data.push(rowData);
+    } else {
+      // Check if the message matches the expected format for the second condition
+      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*코스명:\s*(.*?),\s*([^)]+)\)/);
+      if (match) {
+        const [, site, scenarioId, robotDetails, departure, course, rounds] = match;
+        const robotMatch = robotDetails.match(/\|([^>]*)>/);
+        const robotName = robotMatch ? robotMatch[1] : '';
+
+        // Extracting Korean date and time
+        const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+
+        // Format the data as an array
+        const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), course.trim(), username];
+
+        // Pushing formatted data to the array
+        data.push(rowData);
+      }
     }
-
-    const [, site, scenarioId, robotDetails, departure, destination] = match;
-
-    // Extracting Korean date and time
-    const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
-
-    const robotMatch = robotDetails.match(/\|([^>]*)>/);
-    const robotName = robotMatch ? robotMatch[1] : '';
-
-    // Format the data as an array
-    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
-
-    // Pushing formatted data to the array
-    data.push(rowData);
   });
 
   return data;
