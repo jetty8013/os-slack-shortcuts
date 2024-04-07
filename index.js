@@ -147,7 +147,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
               token: process.env.SLACK_BOT_TOKEN,
               channel: shortcut.channel.id,
               thread_ts: shortcut.message.thread_ts, // Reply to the main thread
-              text: `이미 전송된 기록입니다.`, // Customize your reply text here
+              text: `이미 전송된 기록입니다. 요청자 : ${real_name}`, // Customize your reply text here
             });
             return null; // Return null if no SO log reply is found;
           }
