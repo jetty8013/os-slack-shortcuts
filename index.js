@@ -79,7 +79,7 @@ const parseThreadReplies = (replies, username) => {
 };
 
 // Handle MessageShortcut
-app.shortcut('slackShortcuts', async ({ shortcut, ack }) => {
+app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
   await ack();
 
