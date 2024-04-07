@@ -58,28 +58,26 @@ const parseThreadReplies = (replies, username) => {
     }
 
     // Check if the message matches the expected format
-    const match = reply.text.match(/\[(.*?)\]\[(.*?)\][^:]+:\s*(.*?)\s*>\s*:\white_check_mark:기체가 배정되었습니다.\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
+    const match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\(([^,]+),\s*목적지:\s*(.*?)\)/);
     if (!match) {
       return; // Skip this iteration if the regex doesn't match
     }
 
-    const [, site, robotDetails, scenarioDetails, departure, destination] = match;
+    const [, site, scenarioId, robotDetails, departure, destination] = match;
 
     // Extracting Korean date and time
     const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
-    // Extracting the robot name from robotDetails
     const robotMatch = robotDetails.match(/\|([^>]*)>/);
     const robotName = robotMatch ? robotMatch[1] : '';
 
     // Format the data as an array
-    const rowData = [koreanDate, koreanTime, site.trim(), scenarioDetails.trim(), robotName.trim(), destination.trim(), username];
+    const rowData = [koreanDate, koreanTime, site.trim(), scenarioId.trim(), robotName.trim(), destination.trim(), username];
 
     // Pushing formatted data to the array
     data.push(rowData);
   });
 
-  console.log(data);
   return data;
 };
 
