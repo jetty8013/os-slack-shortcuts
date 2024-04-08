@@ -82,7 +82,7 @@ const parseThreadReplies = (replies, username) => {
       //match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:)?\s*(.*?),\s*(.*?)\)/);
       match = reply.text.match(/\[([^\]]*?)\]\[#(\d+)\]\[<[^>]*\|([^\]]*?)>\]\s*:(.*?)\((?:코스명:)?\s*([^,]*?),\s*(.*?)\)/);
       if (match) {
-        [site, currentScenarioId, robotName, , courseName, rounds] = match;
+        [, site, currentScenarioId, robotName, , courseName, rounds] = match;
         // robotName = getRobotName(robotDetails); // Get robot name from robotDetails
         // scenarioId = currentScenarioId.trim();
         // courseName = currentCourse.trim();
