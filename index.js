@@ -124,7 +124,7 @@ const isSOLog = (reply) => {
 };
 
 const isScenarioEnd = (reply) => {
-  return reply.text.includes('시나리오가 마무리 되었습니다.');
+  return !reply.text.includes('시나리오가 마무리 되었습니다.');
 };
 
 // Handle MessageShortcut
@@ -143,6 +143,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
 
       const threadReplies = await fetchAllReplies(shortcut.message.thread_ts, shortcut.channel.id);
       if (threadReplies.length > 0) {
+        let scenarioNotEnded = true; // Flag to track if scenario has not ended
         for (let i = 0; i < threadReplies.length; i++) {
           const reply = threadReplies[i];
           if (isSOLog(reply)) {
@@ -156,14 +157,18 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
           }
 
           if (!isScenarioEnd(reply)) {
-            await app.client.chat.postMessage({
-              token: process.env.SLACK_BOT_TOKEN,
-              channel: shortcut.channel.id,
-              thread_ts: shortcut.message.thread_ts, // Reply to the main thread
-              text: `완료되지 않은 시나리오 입니다. 요청자: ${real_name}`, // Customize your reply text here
-            });
-            return null; // Return null if the scenario has already ended
+            scenarioNotEnded = false; // Scenario has ended
           }
+        }
+
+        if (scenarioNotEnded) {
+          await app.client.chat.postMessage({
+            token: process.env.SLACK_BOT_TOKEN,
+            channel: shortcut.channel.id,
+            thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+            text: `완료되지 않은 시나리오 입니다. 요청자: ${real_name}`, // Customize your reply text here
+          });
+          return null; // Return null if the scenario has not ended
         }
 
         const parsedData = parseThreadReplies(threadReplies, real_name);
