@@ -86,6 +86,7 @@ const parseThreadReplies = (replies, username) => {
         // robotName = getRobotName(robotDetails); // Get robot name from robotDetails
         // scenarioId = currentScenarioId.trim();
         // courseName = currentCourse.trim();
+        scenarioId = currentScenarioId;
 
         // Extracting Korean date and time
         //const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
