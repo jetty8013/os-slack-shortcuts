@@ -155,7 +155,7 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
             return null; // Return null if no SO log reply is found;
           }
 
-          if (isScenarioEnd(reply)) {
+          if (!isScenarioEnd(reply)) {
             await app.client.chat.postMessage({
               token: process.env.SLACK_BOT_TOKEN,
               channel: shortcut.channel.id,
