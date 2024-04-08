@@ -79,15 +79,16 @@ const parseThreadReplies = (replies, username) => {
       courseName = '';
     } else {
       // Check if the message matches the expected format for the second condition
-      match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:)?\s*(.*?),\s*(.*?)\)/);
+      //match = reply.text.match(/\[(.*?)\]\[#(\d+)\][^:]+:\s*(.*?)\s*\((코스명:)?\s*(.*?),\s*(.*?)\)/);
+      match = reply.text.match(/\[([^\]]*?)\]\[#(\d+)\]\[<[^>]*\|([^\]]*?)>\]\s*:(.*?)\((?:코스명:)?\s*([^,]*?),\s*(.*?)\)/);
       if (match) {
-        [, site, currentScenarioId, robotDetails, , currentCourse, rounds] = match;
-        robotName = getRobotName(robotDetails); // Get robot name from robotDetails
-        scenarioId = currentScenarioId.trim();
-        courseName = currentCourse.trim();
+        [site, currentScenarioId, robotName, , courseName, rounds] = match;
+        // robotName = getRobotName(robotDetails); // Get robot name from robotDetails
+        // scenarioId = currentScenarioId.trim();
+        // courseName = currentCourse.trim();
 
         // Extracting Korean date and time
-        const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
+        //const [koreanDate, koreanTime] = convertToKoreanDateTime(reply.ts);
 
         // Format the data as an array for the second condition
         //const rowData = [koreanDate, koreanTime, site.trim(), scenarioId, robotName.trim(), courseName, username];
@@ -122,6 +123,10 @@ const isSOLog = (reply) => {
   return reply.text.includes('배차 기록 전송 완료') && reply.bot_profile && reply.bot_profile.name === '운영일지(SO)';
 };
 
+const isScenarioEnd = (reply) => {
+  return !reply.text.includes('시나리오가 마무리 되었습니다.');
+};
+
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
@@ -148,6 +153,16 @@ app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
               text: `이미 전송된 기록입니다. 요청자 : ${real_name}`, // Customize your reply text here
             });
             return null; // Return null if no SO log reply is found;
+          }
+
+          if (isScenarioEnd(reply)) {
+            await app.client.chat.postMessage({
+              token: process.env.SLACK_BOT_TOKEN,
+              channel: shortcut.channel.id,
+              thread_ts: shortcut.message.thread_ts, // Reply to the main thread
+              text: `완료되지 않은 시나리오 입니다. 요청자: ${real_name}`, // Customize your reply text here
+            });
+            return null; // Return null if the scenario has already ended
           }
         }
 
