@@ -124,7 +124,7 @@ const isSOLog = (reply) => {
 };
 
 const isScenarioEnd = (reply) => {
-  return !reply.text.includes('시나리오가 마무리 되었습니다.');
+  return reply.text.includes('시나리오가 마무리 되었습니다.');
 };
 
 // Handle MessageShortcut
