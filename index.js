@@ -128,6 +128,69 @@ const isScenarioEnd = (reply) => {
   return !reply.text.includes('시나리오가 마무리 되었습니다.');
 };
 
+// Endpoint to trigger modal
+app.get('/trigger-modal', async (req, res) => {
+  const { trigger_id, user_id } = req.query;
+
+  if (!trigger_id || !user_id) {
+    return res.status(400).send('Missing trigger_id or user_id');
+  }
+
+  try {
+    // Open a modal
+    await boltApp.client.views.open({
+      trigger_id: trigger_id,
+      view: {
+        type: 'modal',
+        callback_id: 'modal-identifier',
+        title: {
+          type: 'plain_text',
+          text: 'My Modal',
+          emoji: true,
+        },
+        submit: {
+          type: 'plain_text',
+          text: 'Submit',
+          emoji: true,
+        },
+        close: {
+          type: 'plain_text',
+          text: 'Cancel',
+          emoji: true,
+        },
+        blocks: [
+          {
+            type: 'section',
+            block_id: 'section-identifier',
+            text: {
+              type: 'mrkdwn',
+              text: 'Welcome to my modal!',
+            },
+          },
+          {
+            type: 'input',
+            block_id: 'input-identifier',
+            label: {
+              type: 'plain_text',
+              text: 'Enter your name',
+              emoji: true,
+            },
+            element: {
+              type: 'plain_text_input',
+              action_id: 'input-action',
+            },
+          },
+        ],
+      },
+    });
+
+    res.status(200).send('Modal opened');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Failed to open modal');
+  }
+});
+
 app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
   await ack();
