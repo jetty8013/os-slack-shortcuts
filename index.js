@@ -128,6 +128,131 @@ const isScenarioEnd = (reply) => {
   return !reply.text.includes('시나리오가 마무리 되었습니다.');
 };
 
+app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
+  // Acknowledge the shortcut request
+  await ack();
+
+  try {
+    // Call views.open with the built-in client
+    await client.views.open({
+      trigger_id: shortcut.trigger_id,
+      view: {
+        type: 'modal',
+        submit: {
+          type: 'plain_text',
+          text: '다음 단계',
+          emoji: true,
+        },
+        close: {
+          type: 'plain_text',
+          text: '취소',
+          emoji: true,
+        },
+        title: {
+          type: 'plain_text',
+          text: '셋업 요청',
+          emoji: true,
+        },
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'plain_text',
+              text: ':wave: 사용자 이름!\n\n설명',
+              emoji: true,
+            },
+          },
+          {
+            type: 'divider',
+          },
+          {
+            type: 'input',
+            element: {
+              type: 'plain_text_input',
+              action_id: 'plain_text_input-action',
+            },
+            label: {
+              type: 'plain_text',
+              text: '고객사',
+              emoji: true,
+            },
+          },
+          {
+            type: 'input',
+            element: {
+              type: 'plain_text_input',
+              action_id: 'plain_text_input-action',
+            },
+            label: {
+              type: 'plain_text',
+              text: '사이트 지역',
+              emoji: true,
+            },
+          },
+          {
+            type: 'input',
+            element: {
+              type: 'datepicker',
+              initial_date: '1990-04-28',
+              placeholder: {
+                type: 'plain_text',
+                text: 'Select a date',
+                emoji: true,
+              },
+              action_id: 'datepicker-action',
+            },
+            label: {
+              type: 'plain_text',
+              text: '셋업 완료 희망일',
+              emoji: true,
+            },
+          },
+          {
+            type: 'input',
+            element: {
+              type: 'radio_buttons',
+              options: [
+                {
+                  text: {
+                    type: 'plain_text',
+                    text: '캠핑',
+                    emoji: true,
+                  },
+                  value: 'value-0',
+                },
+                {
+                  text: {
+                    type: 'plain_text',
+                    text: '순찰',
+                    emoji: true,
+                  },
+                  value: 'value-1',
+                },
+                {
+                  text: {
+                    type: 'plain_text',
+                    text: '시연',
+                    emoji: true,
+                  },
+                  value: 'value-2',
+                },
+              ],
+              action_id: 'radio_buttons-action',
+            },
+            label: {
+              type: 'plain_text',
+              text: '요청 타입',
+              emoji: true,
+            },
+          },
+        ],
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
