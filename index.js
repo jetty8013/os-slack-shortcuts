@@ -132,6 +132,9 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   await ack();
 
   try {
+    const userInfo = await client.users.info({ user: shortcut.user.id });
+    const userName = userInfo.user.real_name || userInfo.user.name;
+
     await client.views.open({
       trigger_id: shortcut.trigger_id,
       view: {
@@ -157,7 +160,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'section',
             text: {
               type: 'plain_text',
-              text: ':wave: 사용자 이름!\n\n설명',
+              text: `:wave: ${userName}!\n\n설명`,
               emoji: true,
             },
           },
@@ -243,6 +246,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
               text: '요청 타입',
               emoji: true,
             },
+            block_id: 'request_type_block', // Adding block_id for better reference
           },
         ],
       },
@@ -258,7 +262,9 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   // Log the view.state.values to debug the structure
   console.log(JSON.stringify(view.state.values, null, 2));
 
-  const requestTypeBlock = view.state.values['request_type'];
+  // Extracting values with their specific block_id
+  const requestTypeBlockId = 'Tkz/j'; // Replace with dynamic extraction if needed
+  const requestTypeBlock = view.state.values[requestTypeBlockId];
   const selectedOption = requestTypeBlock ? requestTypeBlock['request_type'].selected_option.value : null;
 
   if (!selectedOption) {
