@@ -427,6 +427,35 @@ app.action('next_step_button', async ({ ack, body, view, client }) => {
             emoji: true,
           },
         },
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: 'XD',
+            emoji: true,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          block_id: 'date_block',
+          text: {
+            type: 'mrkdwn',
+            text: ':art: *래핑지 요청*\n설명',
+          },
+          accessory: {
+            type: 'datepicker',
+            initial_date: '2024-05-22',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select a date',
+              emoji: true,
+            },
+            action_id: 'date_select',
+          },
+        },
       ],
     },
   });
