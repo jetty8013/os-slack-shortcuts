@@ -7,66 +7,6 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
 });
 
-app.command('/ticket', async ({ ack, body, client, logger }) => {
-  // Acknowledge the command request
-  await ack();
-
-  try {
-    // Call views.open with the built-in client
-    const result = await client.views.open({
-      // Pass a valid trigger_id within 3 seconds of receiving it
-      trigger_id: body.trigger_id,
-      // View payload
-      view: {
-        type: 'modal',
-        // View identifier
-        callback_id: 'view_1',
-        title: {
-          type: 'plain_text',
-          text: 'Modal title',
-        },
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: 'Welcome to a modal with _blocks_',
-            },
-            accessory: {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: 'Click me!',
-              },
-              action_id: 'button_abc',
-            },
-          },
-          {
-            type: 'input',
-            block_id: 'input_c',
-            label: {
-              type: 'plain_text',
-              text: 'What are your hopes and dreams?',
-            },
-            element: {
-              type: 'plain_text_input',
-              action_id: 'dreamy_input',
-              multiline: true,
-            },
-          },
-        ],
-        submit: {
-          type: 'plain_text',
-          text: 'Submit',
-        },
-      },
-    });
-    logger.info(result);
-  } catch (error) {
-    logger.error(error);
-  }
-});
-
 // Function to convert Unix Epoch time to Korean date and time
 const convertToKoreanDateTime = (timestamp) => {
   const unixEpochTime = parseFloat(timestamp);
@@ -193,11 +133,12 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   await ack();
 
   try {
-    // Call views.open with the built-in client
+    // Open the initial modal
     await client.views.open({
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
+        callback_id: 'setup_modal',
         submit: {
           type: 'plain_text',
           text: '다음 단계',
@@ -229,7 +170,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'plain_text_input-action',
+              action_id: 'customer_name',
             },
             label: {
               type: 'plain_text',
@@ -241,7 +182,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'plain_text_input-action',
+              action_id: 'site_location',
             },
             label: {
               type: 'plain_text',
@@ -259,7 +200,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'datepicker-action',
+              action_id: 'desired_completion_date',
             },
             label: {
               type: 'plain_text',
@@ -278,7 +219,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '캠핑',
                     emoji: true,
                   },
-                  value: 'value-0',
+                  value: 'camping',
                 },
                 {
                   text: {
@@ -286,7 +227,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '순찰',
                     emoji: true,
                   },
-                  value: 'value-1',
+                  value: 'patrol',
                 },
                 {
                   text: {
@@ -294,10 +235,10 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '시연',
                     emoji: true,
                   },
-                  value: 'value-2',
+                  value: 'demonstration',
                 },
               ],
-              action_id: 'radio_buttons-action',
+              action_id: 'request_type',
             },
             label: {
               type: 'plain_text',
@@ -312,6 +253,188 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
     console.error(error);
   }
 });
+
+// Handle the view submission event
+app.view('setup_modal', async ({ ack, body, view, client }) => {
+  await ack();
+
+  const selectedOption = view.state.values['request_type']['radio_buttons-action'].selected_option.value;
+
+  // Define the second modal
+  const secondModal = {
+    type: 'modal',
+    callback_id: 'next_step_modal',
+    title: {
+      type: 'plain_text',
+      text: 'App menu',
+      emoji: true,
+    },
+    submit: {
+      type: 'plain_text',
+      text: 'Submit',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `This is :smile: *${selectedOption}*`,
+          },
+          {
+            type: 'image',
+            image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+            alt_text: 'cute cat',
+          },
+          {
+            type: 'image',
+            image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+            alt_text: 'cute cat',
+          },
+          {
+            type: 'image',
+            image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+            alt_text: 'cute cat',
+          },
+        ],
+      },
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: 'Operation',
+          emoji: true,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'input',
+        element: {
+          type: 'checkboxes',
+          options: [
+            {
+              text: {
+                type: 'plain_text',
+                text: '뉴비고(캠핑매니저)',
+                emoji: true,
+              },
+              value: 'value-0',
+            },
+            {
+              text: {
+                type: 'plain_text',
+                text: '뉴비오더 어드민(뉴비오더 매니저)',
+                emoji: true,
+              },
+              value: 'value-1',
+            },
+          ],
+          action_id: 'checkboxes-action',
+        },
+        label: {
+          type: 'plain_text',
+          text: '고객 제공 플랫폼',
+          emoji: true,
+        },
+      },
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: 'Robot',
+          emoji: true,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'input',
+        element: {
+          type: 'multi_users_select',
+          placeholder: {
+            type: 'plain_text',
+            text: 'Select users',
+            emoji: true,
+          },
+          action_id: 'multi_users_select-action',
+        },
+        label: {
+          type: 'plain_text',
+          text: '로봇 모델',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        element: {
+          type: 'number_input',
+          is_decimal_allowed: false,
+          action_id: 'number_input-action',
+        },
+        label: {
+          type: 'plain_text',
+          text: '기체 수',
+          emoji: true,
+        },
+      },
+      {
+        type: 'input',
+        element: {
+          type: 'checkboxes',
+          options: [
+            {
+              text: {
+                type: 'plain_text',
+                text: '영업배상',
+                emoji: true,
+              },
+              value: 'value-1',
+            },
+            {
+              text: {
+                type: 'plain_text',
+                text: '생산물책임',
+                emoji: true,
+              },
+              value: 'value-2',
+            },
+          ],
+          action_id: 'checkboxes-action',
+        },
+        label: {
+          type: 'plain_text',
+          text: '보험 가입',
+          emoji: true,
+        },
+      },
+    ],
+  };
+
+  try {
+    // Open the second modal
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: secondModal,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// Start the app
+(async () => {
+  await app.start(process.env.PORT || 3000);
+  console.log('⚡️ Bolt app is running!');
+})();
 
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
