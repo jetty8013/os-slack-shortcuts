@@ -140,6 +140,11 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
+        close: {
+          type: 'plain_text',
+          text: '취소',
+          emoji: true,
+        },
         title: {
           type: 'plain_text',
           text: '셋업 요청',
