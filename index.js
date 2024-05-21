@@ -141,39 +141,12 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       view: {
         type: 'modal',
         callback_id: 'setup_modal',
-        submit: {
-          type: 'plain_text',
-          text: '다음 단계',
-          emoji: true,
-        },
-        close: {
-          type: 'plain_text',
-          text: '취소',
-          emoji: true,
-        },
         title: {
           type: 'plain_text',
           text: '셋업 요청',
           emoji: true,
         },
         blocks: [
-          {
-            type: 'section',
-            block_id: 's_block',
-            text: {
-              type: 'plain_text',
-              text: 'I am but an updated modal',
-              emoji: true,
-            },
-            accessory: {
-              type: 'button',
-              action_id: 'button_4',
-              text: {
-                type: 'plain_text',
-                text: 'Click me',
-              },
-            },
-          },
           {
             type: 'section',
             text: {
@@ -264,6 +237,23 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
               emoji: true,
             },
           },
+          {
+            type: 'section',
+            block_id: 's_block',
+            text: {
+              type: 'plain_text',
+              text: 'I am but an updated modal',
+              emoji: true,
+            },
+            accessory: {
+              type: 'button',
+              action_id: 'button_4',
+              text: {
+                type: 'plain_text',
+                text: '다음 단계',
+              },
+            },
+          },
         ],
       },
     });
@@ -276,7 +266,7 @@ app.action('button_4', async ({ ack, body, view, client }) => {
   await ack();
 
   await client.views.update({
-    view_id: view.id,
+    view_id: body.view.id,
     view: {
       type: 'modal',
       submit: {
