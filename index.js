@@ -430,12 +430,6 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   }
 });
 
-// Start the app
-(async () => {
-  await app.start(process.env.PORT || 3000);
-  console.log('⚡️ Bolt app is running!');
-})();
-
 // Handle MessageShortcut
 app.shortcut('slackShortcuts', async ({ shortcut, ack, client }) => {
   // Acknowledge the shortcut request
