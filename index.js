@@ -132,7 +132,6 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   await ack();
 
   try {
-    // 사용자 정보 가져오기
     const userInfo = await client.users.info({ user: shortcut.user.id });
     const userName = userInfo.user.real_name || userInfo.user.name;
 
@@ -140,7 +139,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
-        callback_id: 'modal-id',
+        callback_id: 'first_modal',
         title: {
           type: 'plain_text',
           text: '셋업 요청',
@@ -159,12 +158,14 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           },
           {
             type: 'section',
+            block_id: 'customer_block',
             text: {
               type: 'mrkdwn',
               text: ':clipboard: *고객사*\n설명',
             },
             accessory: {
               type: 'static_select',
+              action_id: 'customer_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -177,7 +178,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: 'KT',
                     emoji: true,
                   },
-                  value: 'value-0',
+                  value: 'kt',
                 },
                 {
                   text: {
@@ -185,19 +186,21 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: 'SK 쉴더스',
                     emoji: true,
                   },
-                  value: 'value-1',
+                  value: 'sk_shielders',
                 },
               ],
             },
           },
           {
             type: 'section',
+            block_id: 'type_block',
             text: {
               type: 'mrkdwn',
               text: ':fairy: *요청 타입*\n설명',
             },
             accessory: {
               type: 'static_select',
+              action_id: 'type_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -210,7 +213,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '캠핑',
                     emoji: true,
                   },
-                  value: 'value-0',
+                  value: 'camping',
                 },
                 {
                   text: {
@@ -218,7 +221,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '순찰',
                     emoji: true,
                   },
-                  value: 'value-1',
+                  value: 'patrol',
                 },
                 {
                   text: {
@@ -226,44 +229,42 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '시연',
                     emoji: true,
                   },
-                  value: 'value-2',
+                  value: 'demonstration',
                 },
               ],
             },
           },
           {
             type: 'section',
+            block_id: 'date_block',
             text: {
               type: 'mrkdwn',
               text: ':calendar: *셋업 완료 희망일*\n설명',
             },
             accessory: {
               type: 'datepicker',
-              initial_date: '1990-04-28',
+              initial_date: '2024-05-21',
               placeholder: {
                 type: 'plain_text',
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'actionId-1',
+              action_id: 'date_select',
             },
           },
           {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: ' ',
-            },
-            accessory: {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: '다음 단계',
-                emoji: true,
+            type: 'actions',
+            elements: [
+              {
+                type: 'button',
+                text: {
+                  type: 'plain_text',
+                  text: '다음 단계',
+                  emoji: true,
+                },
+                action_id: 'next_step',
               },
-              value: 'click_me_123',
-              action_id: 'next_step_button',
-            },
+            ],
           },
         ],
         close: {
@@ -278,169 +279,101 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   }
 });
 
-app.action('next_step_button', async ({ ack, body, view, client }) => {
+app.action('next_step', async ({ ack, body, client }) => {
   await ack();
 
+  const stateValues = body.view.state.values;
 
-  await client.views.update({
-    view_id: body.view.id,
-    view: {
-      type: 'modal',
-      submit: {
-        type: 'plain_text',
-        text: 'Submit',
-        emoji: true,
+  const customer = stateValues.customer_block.customer_select.selected_option.value;
+  const requestType = stateValues.type_block.type_select.selected_option.value;
+  const date = stateValues.date_block.date_select.selected_date;
+
+  let additionalBlocks = [];
+
+  if (requestType === 'camping') {
+    additionalBlocks = [
+      {
+        type: 'input',
+        block_id: 'camping_info_block',
+        element: {
+          type: 'plain_text_input',
+          action_id: 'camping_info',
+        },
+        label: {
+          type: 'plain_text',
+          text: '캠핑 추가 정보',
+          emoji: true,
+        },
       },
-      close: {
-        type: 'plain_text',
-        text: 'Cancel',
-        emoji: true,
+    ];
+  } else if (requestType === 'patrol') {
+    additionalBlocks = [
+      {
+        type: 'input',
+        block_id: 'patrol_info_block',
+        element: {
+          type: 'plain_text_input',
+          action_id: 'patrol_info',
+        },
+        label: {
+          type: 'plain_text',
+          text: '순찰 추가 정보',
+          emoji: true,
+        },
       },
-      title: {
-        type: 'plain_text',
-        text: 'App menu',
-        emoji: true,
+    ];
+  } else if (requestType === 'demonstration') {
+    additionalBlocks = [
+      {
+        type: 'input',
+        block_id: 'demo_info_block',
+        element: {
+          type: 'plain_text_input',
+          action_id: 'demo_info',
+        },
+        label: {
+          type: 'plain_text',
+          text: '시연 추가 정보',
+          emoji: true,
+        },
       },
-      blocks: [
-        {
-          type: 'context',
-          elements: [
-            {
+    ];
+  }
+
+  try {
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: 'modal',
+        callback_id: 'second_modal',
+        title: {
+          type: 'plain_text',
+          text: '다음 단계',
+          emoji: true,
+        },
+        blocks: [
+          {
+            type: 'section',
+            text: {
               type: 'mrkdwn',
-              text: 'This is :smile: *caming*',
+              text: `:wave: 고객사: ${customer}, 요청 타입: ${requestType}, 완료 희망일: ${date}`,
             },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-          ],
+          },
+          ...additionalBlocks,
+        ],
+        submit: {
+          type: 'plain_text',
+          text: '제출',
         },
-        {
-          type: 'header',
-          text: {
-            type: 'plain_text',
-            text: 'Operation',
-            emoji: true,
-          },
+        close: {
+          type: 'plain_text',
+          text: '취소',
         },
-        {
-          type: 'divider',
-        },
-        {
-          type: 'input',
-          element: {
-            type: 'checkboxes',
-            options: [
-              {
-                text: {
-                  type: 'plain_text',
-                  text: '뉴비고(캠핑매니저)',
-                  emoji: true,
-                },
-                value: 'value-0',
-              },
-              {
-                text: {
-                  type: 'plain_text',
-                  text: '뉴비오더 어드민(뉴비오더 매니저)',
-                  emoji: true,
-                },
-                value: 'value-1',
-              },
-            ],
-            action_id: 'checkboxes-action',
-          },
-          label: {
-            type: 'plain_text',
-            text: '고객 제공 플랫폼',
-            emoji: true,
-          },
-        },
-        {
-          type: 'header',
-          text: {
-            type: 'plain_text',
-            text: 'Robot',
-            emoji: true,
-          },
-        },
-        {
-          type: 'divider',
-        },
-        {
-          type: 'input',
-          element: {
-            type: 'multi_users_select',
-            placeholder: {
-              type: 'plain_text',
-              text: 'Select users',
-              emoji: true,
-            },
-            action_id: 'multi_users_select-action',
-          },
-          label: {
-            type: 'plain_text',
-            text: '로봇 모델',
-            emoji: true,
-          },
-        },
-        {
-          type: 'input',
-          element: {
-            type: 'number_input',
-            is_decimal_allowed: false,
-            action_id: 'number_input-action',
-          },
-          label: {
-            type: 'plain_text',
-            text: '기체 수',
-            emoji: true,
-          },
-        },
-        {
-          type: 'input',
-          element: {
-            type: 'checkboxes',
-            options: [
-              {
-                text: {
-                  type: 'plain_text',
-                  text: '영업배상',
-                  emoji: true,
-                },
-                value: 'value-1',
-              },
-              {
-                text: {
-                  type: 'plain_text',
-                  text: '생산물책임',
-                  emoji: true,
-                },
-                value: 'value-2',
-              },
-            ],
-            action_id: 'checkboxes-action',
-          },
-          label: {
-            type: 'plain_text',
-            text: '보험 가입',
-            emoji: true,
-          },
-        },
-      ],
-    },
-  });
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 // Handle MessageShortcut
