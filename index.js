@@ -129,11 +129,9 @@ const isScenarioEnd = (reply) => {
 };
 
 app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
-  // Acknowledge the shortcut request
   await ack();
 
   try {
-    // Open the initial modal
     await client.views.open({
       trigger_id: shortcut.trigger_id,
       view: {
@@ -254,14 +252,21 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   }
 });
 
-// Handle the view submission event
 app.view('setup_modal', async ({ ack, body, view, client }) => {
   await ack();
 
-  const selectedOption = view.state.values['request_type']['radio_buttons-action'].selected_option.value;
+  // Log the view.state.values to debug the structure
+  console.log(JSON.stringify(view.state.values, null, 2));
 
-  // Define the second modal
-  const secondModal = {
+  const requestTypeBlock = view.state.values['request_type'];
+  const selectedOption = requestTypeBlock ? requestTypeBlock['request_type'].selected_option.value : null;
+
+  if (!selectedOption) {
+    console.error('No selected option found for request_type');
+    return;
+  }
+
+  const nextView = {
     type: 'modal',
     callback_id: 'next_step_modal',
     title: {
@@ -420,10 +425,9 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   };
 
   try {
-    // Open the second modal
-    await client.views.open({
-      trigger_id: body.trigger_id,
-      view: secondModal,
+    await client.views.update({
+      view_id: view.id,
+      view: nextView,
     });
   } catch (error) {
     console.error(error);
