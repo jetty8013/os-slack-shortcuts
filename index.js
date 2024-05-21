@@ -132,6 +132,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   await ack();
 
   try {
+    // 사용자 정보 가져오기
     const userInfo = await client.users.info({ user: shortcut.user.id });
     const userName = userInfo.user.real_name || userInfo.user.name;
 
@@ -159,9 +160,8 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           {
             type: 'section',
             text: {
-              type: 'plain_text',
+              type: 'mrkdwn', // 사용자 이름을 포함한 텍스트는 mrkdwn 타입으로 설정
               text: `:wave: ${userName}!\n\n설명`,
-              emoji: true,
             },
           },
           {
@@ -171,7 +171,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'customer_name',
+              action_id: 'plain_text_input-action',
             },
             label: {
               type: 'plain_text',
@@ -183,7 +183,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'site_location',
+              action_id: 'plain_text_input-action',
             },
             label: {
               type: 'plain_text',
@@ -201,7 +201,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'desired_completion_date',
+              action_id: 'datepicker-action',
             },
             label: {
               type: 'plain_text',
@@ -239,14 +239,13 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                   value: 'demonstration',
                 },
               ],
-              action_id: 'request_type',
+              action_id: 'radio_buttons-action',
             },
             label: {
               type: 'plain_text',
               text: '요청 타입',
               emoji: true,
             },
-            block_id: 'request_type_block', // Adding block_id for better reference
           },
         ],
       },
@@ -272,6 +271,7 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
     return;
   }
 
+  // 새로운 모달을 정의
   const nextView = {
     type: 'modal',
     callback_id: 'next_step_modal',
@@ -431,10 +431,14 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   };
 
   try {
-    await client.views.update({
-      view_id: view.id,
-      view: nextView,
-    });
+    if (selectedOption === 'camping') {
+      await client.views.open({
+        trigger_id: body.trigger_id,
+        view: nextView,
+      });
+    } else {
+      console.log(`Selected option is ${selectedOption}, not "camping". No new modal opened.`);
+    }
   } catch (error) {
     console.error(error);
   }
