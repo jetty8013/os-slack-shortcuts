@@ -140,7 +140,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
-        // callback_id: 'setup_modal',
+        callback_id: 'setup_modal',
         // submit: {
         //   type: 'plain_text',
         //   text: '다음 단계',
