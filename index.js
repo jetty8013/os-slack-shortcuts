@@ -159,6 +159,23 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
         blocks: [
           {
             type: 'section',
+            block_id: 's_block',
+            text: {
+              type: 'plain_text',
+              text: 'I am but an updated modal',
+              emoji: true,
+            },
+            accessory: {
+              type: 'button',
+              action_id: 'button_4',
+              text: {
+                type: 'plain_text',
+                text: 'Click me',
+              },
+            },
+          },
+          {
+            type: 'section',
             text: {
               type: 'mrkdwn',
               text: `:wave: ${userName}!\n\n설명`,
@@ -255,7 +272,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   }
 });
 
-app.view('setup_modal', async ({ ack, body, view, client }) => {
+app.action('button_4', async ({ ack, body, view, client }) => {
   await ack();
 
   await client.views.update({
