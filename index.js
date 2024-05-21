@@ -132,6 +132,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   await ack();
 
   try {
+    // 사용자 정보 가져오기
     const userInfo = await client.users.info({ user: shortcut.user.id });
     const userName = userInfo.user.real_name || userInfo.user.name;
 
@@ -139,7 +140,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
-        callback_id: 'first_modal',
+        callback_id: 'modal-id',
         title: {
           type: 'plain_text',
           text: '셋업 요청',
@@ -158,14 +159,12 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           },
           {
             type: 'section',
-            block_id: 'customer_block',
             text: {
               type: 'mrkdwn',
               text: ':clipboard: *고객사*\n설명',
             },
             accessory: {
               type: 'static_select',
-              action_id: 'customer_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -178,7 +177,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: 'KT',
                     emoji: true,
                   },
-                  value: 'kt',
+                  value: 'value-0',
                 },
                 {
                   text: {
@@ -186,21 +185,19 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: 'SK 쉴더스',
                     emoji: true,
                   },
-                  value: 'sk_shielders',
+                  value: 'value-1',
                 },
               ],
             },
           },
           {
             type: 'section',
-            block_id: 'type_block',
             text: {
               type: 'mrkdwn',
               text: ':fairy: *요청 타입*\n설명',
             },
             accessory: {
               type: 'static_select',
-              action_id: 'type_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -213,7 +210,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '캠핑',
                     emoji: true,
                   },
-                  value: 'camping',
+                  value: 'value-0',
                 },
                 {
                   text: {
@@ -221,7 +218,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '순찰',
                     emoji: true,
                   },
-                  value: 'patrol',
+                  value: 'value-1',
                 },
                 {
                   text: {
@@ -229,42 +226,44 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                     text: '시연',
                     emoji: true,
                   },
-                  value: 'demonstration',
+                  value: 'value-2',
                 },
               ],
             },
           },
           {
             type: 'section',
-            block_id: 'date_block',
             text: {
               type: 'mrkdwn',
               text: ':calendar: *셋업 완료 희망일*\n설명',
             },
             accessory: {
               type: 'datepicker',
-              initial_date: '2024-05-21',
+              initial_date: '1990-04-28',
               placeholder: {
                 type: 'plain_text',
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'date_select',
+              action_id: 'actionId-1',
             },
           },
           {
-            type: 'actions',
-            elements: [
-              {
-                type: 'button',
-                text: {
-                  type: 'plain_text',
-                  text: '다음 단계',
-                  emoji: true,
-                },
-                action_id: 'next_step',
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: ' ',
+            },
+            accessory: {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: '다음 단계',
+                emoji: true,
               },
-            ],
+              value: 'click_me_123',
+              action_id: 'next_step_button',
+            },
           },
         ],
         close: {
