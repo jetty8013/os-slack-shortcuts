@@ -141,6 +141,11 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       view: {
         type: 'modal',
         callback_id: 'setup_modal',
+        submit: {
+          type: 'plain_text',
+          text: '다음 단계',
+          emoji: true,
+        },
         close: {
           type: 'plain_text',
           text: '취소',
