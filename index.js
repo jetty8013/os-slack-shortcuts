@@ -364,21 +364,20 @@ app.action('next_step_button', async ({ ack, body, view, client }) => {
             type: 'static_select',
             placeholder: {
               type: 'plain_text',
-              text: 'Select users',
+              text: 'Select a model',
               emoji: true,
             },
-            action_id: 'static_select-action',
-          },
-          options: [
-            {
-              text: {
-                type: 'plain_text',
-                text: '1.5R',
-                emoji: true,
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: '1.5R',
+                  emoji: true,
+                },
+                value: 'value-0',
               },
-              value: 'value-0',
-            },
-          ],
+            ],
+          },
           label: {
             type: 'plain_text',
             text: '로봇 모델',
