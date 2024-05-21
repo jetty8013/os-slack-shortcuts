@@ -140,40 +140,23 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
-        callback_id: 'setup_modal',
-        submit: {
-          type: 'plain_text',
-          text: '다음 단계',
-          emoji: true,
-        },
-        close: {
-          type: 'plain_text',
-          text: '취소',
-          emoji: true,
-        },
+        // callback_id: 'setup_modal',
+        // submit: {
+        //   type: 'plain_text',
+        //   text: '다음 단계',
+        //   emoji: true,
+        // },
+        // close: {
+        //   type: 'plain_text',
+        //   text: '취소',
+        //   emoji: true,
+        // },
         title: {
           type: 'plain_text',
           text: '셋업 요청',
           emoji: true,
         },
         blocks: [
-          {
-            type: 'section',
-            block_id: 's_block',
-            text: {
-              type: 'plain_text',
-              text: 'I am but an updated modal',
-              emoji: true,
-            },
-            accessory: {
-              type: 'button',
-              action_id: 'button_4',
-              text: {
-                type: 'plain_text',
-                text: 'Click me',
-              },
-            },
-          },
           {
             type: 'section',
             text: {
@@ -262,6 +245,23 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
               type: 'plain_text',
               text: '요청 타입',
               emoji: true,
+            },
+          },
+          {
+            type: 'section',
+            block_id: 's_block',
+            text: {
+              type: 'plain_text',
+              text: null,
+              emoji: true,
+            },
+            accessory: {
+              type: 'button',
+              action_id: 'button_4',
+              text: {
+                type: 'plain_text',
+                text: '다음 단계',
+              },
             },
           },
         ],
