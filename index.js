@@ -160,7 +160,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           {
             type: 'section',
             text: {
-              type: 'mrkdwn', // 사용자 이름을 포함한 텍스트는 mrkdwn 타입으로 설정
+              type: 'mrkdwn',
               text: `:wave: ${userName}!\n\n설명`,
             },
           },
@@ -171,7 +171,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'plain_text_input-action',
+              action_id: 'customer_name',
             },
             label: {
               type: 'plain_text',
@@ -183,7 +183,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'input',
             element: {
               type: 'plain_text_input',
-              action_id: 'plain_text_input-action',
+              action_id: 'site_location',
             },
             label: {
               type: 'plain_text',
@@ -201,7 +201,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'datepicker-action',
+              action_id: 'desired_completion_date',
             },
             label: {
               type: 'plain_text',
@@ -239,7 +239,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                   value: 'demonstration',
                 },
               ],
-              action_id: 'radio_buttons-action',
+              action_id: 'request_type',
             },
             label: {
               type: 'plain_text',
@@ -261,10 +261,15 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   // Log the view.state.values to debug the structure
   console.log(JSON.stringify(view.state.values, null, 2));
 
-  // Extracting values with their specific block_id
-  const requestTypeBlockId = 'Tkz/j'; // Replace with dynamic extraction if needed
-  const requestTypeBlock = view.state.values[requestTypeBlockId];
-  const selectedOption = requestTypeBlock ? requestTypeBlock['request_type'].selected_option.value : null;
+  // Find the request_type block and get the selected option value
+  let selectedOption = null;
+  for (const blockId in view.state.values) {
+    const block = view.state.values[blockId];
+    if (block['request_type']) {
+      selectedOption = block['request_type'].selected_option.value;
+      break;
+    }
+  }
 
   if (!selectedOption) {
     console.error('No selected option found for request_type');
