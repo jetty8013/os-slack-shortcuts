@@ -279,101 +279,168 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   }
 });
 
-app.action('next_step', async ({ ack, body, client }) => {
+app.action('next_step_button', async ({ ack, body, view, client }) => {
   await ack();
 
-  const stateValues = body.view.state.values;
-
-  const customer = stateValues.customer_block.customer_select.selected_option.value;
-  const requestType = stateValues.type_block.type_select.selected_option.value;
-  const date = stateValues.date_block.date_select.selected_date;
-
-  let additionalBlocks = [];
-
-  if (requestType === 'camping') {
-    additionalBlocks = [
-      {
-        type: 'input',
-        block_id: 'camping_info_block',
-        element: {
-          type: 'plain_text_input',
-          action_id: 'camping_info',
-        },
-        label: {
-          type: 'plain_text',
-          text: '캠핑 추가 정보',
-          emoji: true,
-        },
+  await client.views.update({
+    view_id: body.view.id,
+    view: {
+      type: 'modal',
+      submit: {
+        type: 'plain_text',
+        text: 'Submit',
+        emoji: true,
       },
-    ];
-  } else if (requestType === 'patrol') {
-    additionalBlocks = [
-      {
-        type: 'input',
-        block_id: 'patrol_info_block',
-        element: {
-          type: 'plain_text_input',
-          action_id: 'patrol_info',
-        },
-        label: {
-          type: 'plain_text',
-          text: '순찰 추가 정보',
-          emoji: true,
-        },
+      close: {
+        type: 'plain_text',
+        text: 'Cancel',
+        emoji: true,
       },
-    ];
-  } else if (requestType === 'demonstration') {
-    additionalBlocks = [
-      {
-        type: 'input',
-        block_id: 'demo_info_block',
-        element: {
-          type: 'plain_text_input',
-          action_id: 'demo_info',
-        },
-        label: {
-          type: 'plain_text',
-          text: '시연 추가 정보',
-          emoji: true,
-        },
+      title: {
+        type: 'plain_text',
+        text: 'App menu',
+        emoji: true,
       },
-    ];
-  }
-
-  try {
-    await client.views.open({
-      trigger_id: body.trigger_id,
-      view: {
-        type: 'modal',
-        callback_id: 'second_modal',
-        title: {
-          type: 'plain_text',
-          text: '다음 단계',
-          emoji: true,
-        },
-        blocks: [
-          {
-            type: 'section',
-            text: {
+      blocks: [
+        {
+          type: 'context',
+          elements: [
+            {
               type: 'mrkdwn',
-              text: `:wave: 고객사: ${customer}, 요청 타입: ${requestType}, 완료 희망일: ${date}`,
+              text: 'This is :smile: *caming*',
             },
+            {
+              type: 'image',
+              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+              alt_text: 'cute cat',
+            },
+            {
+              type: 'image',
+              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+              alt_text: 'cute cat',
+            },
+            {
+              type: 'image',
+              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
+              alt_text: 'cute cat',
+            },
+          ],
+        },
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: 'Operation',
+            emoji: true,
           },
-          ...additionalBlocks,
-        ],
-        submit: {
-          type: 'plain_text',
-          text: '제출',
         },
-        close: {
-          type: 'plain_text',
-          text: '취소',
+        {
+          type: 'divider',
         },
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+        {
+          type: 'input',
+          element: {
+            type: 'checkboxes',
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: '뉴비고(캠핑매니저)',
+                  emoji: true,
+                },
+                value: 'value-0',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: '뉴비오더 어드민(뉴비오더 매니저)',
+                  emoji: true,
+                },
+                value: 'value-1',
+              },
+            ],
+            action_id: 'checkboxes-action',
+          },
+          label: {
+            type: 'plain_text',
+            text: '고객 제공 플랫폼',
+            emoji: true,
+          },
+        },
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: 'Robot',
+            emoji: true,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'input',
+          element: {
+            type: 'multi_users_select',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Select users',
+              emoji: true,
+            },
+            action_id: 'multi_users_select-action',
+          },
+          label: {
+            type: 'plain_text',
+            text: '로봇 모델',
+            emoji: true,
+          },
+        },
+        {
+          type: 'input',
+          element: {
+            type: 'number_input',
+            is_decimal_allowed: false,
+            action_id: 'number_input-action',
+          },
+          label: {
+            type: 'plain_text',
+            text: '기체 수',
+            emoji: true,
+          },
+        },
+        {
+          type: 'input',
+          element: {
+            type: 'checkboxes',
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: '영업배상',
+                  emoji: true,
+                },
+                value: 'value-1',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: '생산물책임',
+                  emoji: true,
+                },
+                value: 'value-2',
+              },
+            ],
+            action_id: 'checkboxes-action',
+          },
+          label: {
+            type: 'plain_text',
+            text: '보험 가입',
+            emoji: true,
+          },
+        },
+      ],
+    },
+  });
 });
 
 // Handle MessageShortcut
