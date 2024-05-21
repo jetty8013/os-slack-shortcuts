@@ -159,13 +159,14 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           },
           {
             type: 'section',
+            block_id: 'customer_block',
             text: {
               type: 'mrkdwn',
               text: ':clipboard: *고객사*\n설명',
             },
             accessory: {
               type: 'static_select',
-              action_id: 'actionId-0',
+              action_id: 'customer_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -193,13 +194,14 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           },
           {
             type: 'section',
+            block_id: 'type_block',
             text: {
               type: 'mrkdwn',
               text: ':fairy: *요청 타입*\n설명',
             },
             accessory: {
               type: 'static_select',
-              action_id: 'actionId-1',
+              action_id: 'type_select',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -235,6 +237,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
           },
           {
             type: 'section',
+            block_id: 'date_block',
             text: {
               type: 'mrkdwn',
               text: ':calendar: *셋업 완료 희망일*\n설명',
@@ -247,7 +250,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'actionId-2',
+              action_id: 'date_select',
             },
           },
           {
@@ -278,17 +281,6 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   } catch (error) {
     console.error(error);
   }
-});
-app.action('actionId-0', async ({ ack, body, view, client }) => {
-  await ack();
-});
-
-app.action('actionId-1', async ({ ack, body, view, client }) => {
-  await ack();
-});
-
-app.action('actionId-2', async ({ ack, body, view, client }) => {
-  await ack();
 });
 
 app.action('next_step_button', async ({ ack, body, view, client }) => {
