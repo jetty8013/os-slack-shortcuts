@@ -140,17 +140,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
       trigger_id: shortcut.trigger_id,
       view: {
         type: 'modal',
-        // callback_id: 'setup_modal',
-        // submit: {
-        //   type: 'plain_text',
-        //   text: '다음 단계',
-        //   emoji: true,
-        // },
-        // close: {
-        //   type: 'plain_text',
-        //   text: '취소',
-        //   emoji: true,
-        // },
+        callback_id: 'modal-id',
         title: {
           type: 'plain_text',
           text: '셋업 요청',
@@ -248,23 +238,24 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             },
           },
           {
-            type: 'section',
-            block_id: 's_block',
-            text: {
-              type: 'plain_text',
-              text: "test",
-              emoji: true,
-            },
-            accessory: {
-              type: 'button',
-              action_id: 'button_4',
-              text: {
-                type: 'plain_text',
-                text: '다음 단계',
+            type: 'actions',
+            elements: [
+              {
+                type: 'button',
+                text: {
+                  type: 'plain_text',
+                  text: '다음 단계',
+                },
+                action_id: 'next_step_button',
               },
-            },
+            ],
           },
         ],
+        close: {
+          type: 'plain_text',
+          text: '취소',
+          emoji: true,
+        },
       },
     });
   } catch (error) {
@@ -272,8 +263,15 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
   }
 });
 
-app.action('button_4', async ({ ack, body, view, client }) => {
+app.action('next_step_button', async ({ ack, body, view, client }) => {
   await ack();
+
+  // 입력된 데이터 가져오기
+  const values = body.view.state.values;
+  const customerName = values.customer_name['plain_text_input-action'].value;
+  const siteLocation = values.site_location['plain_text_input-action'].value;
+  const desiredCompletionDate = values.desired_completion_date['datepicker-action'].selected_date;
+  const requestType = values.request_type['radio_buttons-action'].selected_option.value;
 
   await client.views.update({
     view_id: body.view.id,
