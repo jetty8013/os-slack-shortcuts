@@ -249,17 +249,21 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             },
           },
           {
-            type: 'actions',
-            elements: [
-              {
-                type: 'button',
-                text: {
-                  type: 'plain_text',
-                  text: '다음 단계',
-                },
-                action_id: 'next_step_button',
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: ' ',
+            },
+            accessory: {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: '다음 단계',
+                emoji: true,
               },
-            ],
+              value: 'click_me_123',
+              action_id: 'next_step_button',
+            },
           },
         ],
         close: {
