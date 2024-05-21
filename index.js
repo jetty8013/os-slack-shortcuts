@@ -161,7 +161,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: ':clipboard: *고객사*\nChoose from different event lists',
+              text: ':clipboard: *고객사*\n설명',
             },
             accessory: {
               type: 'static_select',
@@ -188,23 +188,6 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                   value: 'value-1',
                 },
               ],
-            },
-          },
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: ':calendar: *셋업 완료 희망일*\n설명',
-            },
-            accessory: {
-              type: 'datepicker',
-              initial_date: '1990-04-28',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Select a date',
-                emoji: true,
-              },
-              action_id: 'actionId-1',
             },
           },
           {
@@ -246,6 +229,23 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
                   value: 'value-2',
                 },
               ],
+            },
+          },
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: ':calendar: *셋업 완료 희망일*\n설명',
+            },
+            accessory: {
+              type: 'datepicker',
+              initial_date: '1990-04-28',
+              placeholder: {
+                type: 'plain_text',
+                text: 'Select a date',
+                emoji: true,
+              },
+              action_id: 'actionId-1',
             },
           },
           {
