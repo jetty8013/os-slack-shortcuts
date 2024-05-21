@@ -259,7 +259,7 @@ app.view('setup_modal', async ({ ack, body, view, client }) => {
   await ack();
 
   await client.views.update({
-    view_id: view.view_id,
+    view_id: view.id,
     view: {
       type: 'modal',
       submit: {
