@@ -281,12 +281,6 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
 app.action('next_step_button', async ({ ack, body, view, client }) => {
   await ack();
 
-  // 입력된 데이터 가져오기
-  const values = body.view.state.values;
-  const customerName = values.customer_name['plain_text_input-action'].value;
-  const siteLocation = values.site_location['plain_text_input-action'].value;
-  const desiredCompletionDate = values.desired_completion_date['datepicker-action'].selected_date;
-  const requestType = values.request_type['radio_buttons-action'].selected_option.value;
 
   await client.views.update({
     view_id: body.view.id,
