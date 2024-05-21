@@ -165,6 +165,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             },
             accessory: {
               type: 'static_select',
+              action_id: 'actionId-0',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -198,6 +199,7 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             },
             accessory: {
               type: 'static_select',
+              action_id: 'actionId-1',
               placeholder: {
                 type: 'plain_text',
                 text: 'Choose list',
@@ -239,13 +241,13 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
             },
             accessory: {
               type: 'datepicker',
-              initial_date: '1990-04-28',
+              initial_date: '2024-05-22',
               placeholder: {
                 type: 'plain_text',
                 text: 'Select a date',
                 emoji: true,
               },
-              action_id: 'actionId-1',
+              action_id: 'actionId-2',
             },
           },
           {
@@ -277,6 +279,17 @@ app.shortcut('setupShortcuts', async ({ shortcut, ack, client }) => {
     console.error(error);
   }
 });
+app.action('actionId-0', async ({ ack, body, view, client }) => {
+  await ack();
+});
+
+app.action('actionId-1', async ({ ack, body, view, client }) => {
+  await ack();
+});
+
+app.action('actionId-2', async ({ ack, body, view, client }) => {
+  await ack();
+});
 
 app.action('next_step_button', async ({ ack, body, view, client }) => {
   await ack();
@@ -301,30 +314,6 @@ app.action('next_step_button', async ({ ack, body, view, client }) => {
         emoji: true,
       },
       blocks: [
-        {
-          type: 'context',
-          elements: [
-            {
-              type: 'mrkdwn',
-              text: 'This is :smile: *caming*',
-            },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-            {
-              type: 'image',
-              image_url: 'https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg',
-              alt_text: 'cute cat',
-            },
-          ],
-        },
         {
           type: 'header',
           text: {
